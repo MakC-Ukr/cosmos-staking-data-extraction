@@ -8,6 +8,4 @@ Curl request to get inflation: curl -X GET "https://api.cosmos.network/cosmos/mi
 For running the data extractor, follow the steps:
 1. Clone this repo `git clone https://github.com/MakC-Ukr/cosmos-staking-data-extraction`
 2. Install Python requirements `pip3 install -r requirements.txt`
-3. Fill the `.env` file details as shown in `.env.example`
-4. Rename `data-example.csv` to `data.csv`
 5. Run extractor: `python3 main.py`

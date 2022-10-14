@@ -13,6 +13,7 @@ from random import sample
 load_dotenv()
 RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
+RANDOM_VALIDATOR_ADDRESS = 'cosmosvalcons1knxq8u4v5gky8hs76wz6zp96s6m5vfujw95wla'
 
 def get_inflation():    
     headers = {
@@ -57,26 +58,26 @@ def get_fees_collected(block_number = -1):
         'accept': 'application/json',
     }
     if block_number == -1:
-        block_number = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height']
+        block_number = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height'] # gets latest block number
         block_number = int(block_number)-2 # This is done since we need to allow Cosmoscan to update latest block as well
-        response = requests.get('https://api.cosmoscan.net/block/'+str(block_number), headers=headers).json()['txs']
+        response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()['txs']
     else:
-        response = requests.get('https://api.cosmoscan.net/block/'+str(block_number), headers=headers).json()['txs']
+        response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()['txs']
     
     fees_collected = 0
     for tx in response:
         fees_collected += float(tx['fee'])
     return fees_collected
 
-print(get_fees_collected())
 
-# with open("data.json", 'w+') as f:
-#     json.dump(get_fees(N), f)
+def get_validator_stake(validator_addr):    
+    headers = {
+        'accept': 'application/json',
+    }
+    validator_set = requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['validators']
+    for val in validator_set:
+        if val['address'] == validator_addr:
+            return int(val['voting_power'])
+    raise Exception('My_Exception: Validator not found')
 
-# print(get_total_supply())
-# def get_total_supply():    
-#     headers = {
-#         'accept': 'application/json',
-#     }
-#     response = requests.get(RPC_URL+'/cosmos/bank/v1beta1/supply', headers=headers).json()
-#     return response
+print(get_validator_stake(RANDOM_VALIDATOR_ADDRESS))

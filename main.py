@@ -58,9 +58,9 @@ def MyThread4(res, key):
 
 # 5 - PRECOMMITS RATIO
 def get_sign_ratio():
-    get_precommit_ratio(LATEST_BLOCK)
+    return get_precommit_ratio(LATEST_BLOCK)
 def MyThread5(res, key):
-    res[key] = get_block_len()
+    res[key] = get_sign_ratio()
 
 # 6 - ATOM STAKED BY VALIDATOR
 def get_atom_staked_v():
@@ -97,6 +97,7 @@ for thread in all_threads:
     thread.join()
 
 df_ls.append(result)
+print(result)
 pd.DataFrame(df_ls).to_csv('data.csv', index=False)
 
 print("Time taken: ", time.time() - t)

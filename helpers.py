@@ -84,3 +84,5 @@ def list_to_dict(ls, keys):
     for i in range(len(ls)):
         d[keys[i]] = ls[i]
     return d
+
+print(get_precommit_ratio(12500672))

@@ -33,7 +33,6 @@ def get_activeValidators_and_time(block_number = -1):
 
 def get_supply_bonded_ratio():
     response = requests.get(RPC_URL+ '/cosmos/staking/v1beta1/pool', headers=headers).json()['pool']
-    print(response)
     total_sup = float(response['bonded_tokens']) +  float(response['not_bonded_tokens'])
     bond_ratio = float(response['bonded_tokens']) / total_sup
     return (total_sup, bond_ratio)
@@ -48,15 +47,18 @@ def get_n_active_validators():
     return int(validator_set)
 
 
-def get_fees_collected(block_number = -1):    
+def get_fees_collected(block_number=-1):    
     if block_number == -1:
         block_number = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height'] # gets latest block number
-        block_number = int(block_number)-2 # This is done since we need to allow Cosmoscan to update latest block as well
+        block_number = int(block_number)-20 # This is done since we need to allow Cosmoscan to update latest block as well
         response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()['txs']
     else:
-        response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()['txs']
-    
+        response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()
+    response=response['txs']
     fees_collected = 0
+    if(response is None):
+        print("No fees collected in block: ", block_number)
+        return 0
     for tx in response:
         fees_collected += float(tx['fee'])
     return fees_collected
@@ -76,4 +78,9 @@ def get_precommit_ratio(block_num):
     ratio = len(response)/active_validators
     return ratio
 
-print(get_precommit_ratio(12444791))
+
+def list_to_dict(ls, keys):
+    d = {}
+    for i in range(len(ls)):
+        d[keys[i]] = ls[i]
+    return d

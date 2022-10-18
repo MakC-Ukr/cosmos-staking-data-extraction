@@ -1,6 +1,6 @@
 import time
 t = time.time()
-# import asyncio
+import threading
 import pandas as pd
 import os
 from threading import Thread
@@ -23,47 +23,80 @@ LATEST_BLOCK = int(LATEST_BLOCK) - 10
 print("LATEST_BLOCK = ", LATEST_BLOCK)
 VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 
-async def bar(i):
-    print("Starting i:", i)
-    x = 0
-    if(i == 0):
-        x = get_supply_bonded_ratio()[0]
-    elif(i == 1):
-        x = get_inflation()
-    elif(i == 2):
-        x = get_fees_collected(LATEST_BLOCK)
-    elif(i == 3):
-        x = get_activeValidators_and_time(LATEST_BLOCK)[1]
-    elif(i == 4):
-        x = get_precommit_ratio(LATEST_BLOCK)
-    elif(i == 5):
-        x = get_validator_stake(VALIDATOR_ADDRESS)
-    elif(i == 6):
-        x = get_supply_bonded_ratio()[1]
-    elif(i == 7):
-        x = get_n_active_validators() # will mostly return 175
-    print("Ending i:", i)
-    return x
+result = {}
 
-# async def main():
-#     values = await asyncio.gather(*[bar(i) for i in range(TOTAL_ATTRIBUTES)])
-#     values.insert(0, LATEST_BLOCK)
-#     single_row = list_to_dict(values, COLUMN_NAMES)
-#     df_ls.append(single_row)
-#     pd.DataFrame(df_ls).to_csv('data.csv', index=False)
-#     return True
-
-# asyncio.run(main())
-# print("Time taken: ", time.time() - t)
-
-def threaded_function():
-    for i in range(TOTAL_ATTRIBUTES):
-        print("running")
-        sleep(1)
+# block_num, inflation_rate, percent_staked, total_block_fees, block_len, sign_ratio, atom_staked_v, total_supply, n_validators
 
 
-if __name__ == "__main__":
-    thread = Thread(target = threaded_function)
+# 0 - BLOCK NUMBER
+def get_block_num():
+    return LATEST_BLOCK
+def MyThread0(res, key):
+    res[key] = get_block_num()
+
+# 1 - INFLATION RATE
+def MyThread1(res, key):
+    res[key] = get_inflation() # get_inflation imported directly from helpers
+
+# 2 - PERCENTAGE ATOM STAKED
+def get_percent_staked():
+    return get_supply_bonded_ratio()[1]
+def MyThread2(res, key):
+    res[key] = get_percent_staked()
+
+# 3 - BLOCK FEES
+def get_total_block_fees():
+    return get_fees_collected(LATEST_BLOCK)
+def MyThread3(res, key):
+    res[key] = get_total_block_fees()
+
+# 4 - BLOCK LENGTH
+def get_block_len():
+    return get_activeValidators_and_time(LATEST_BLOCK)[1]
+def MyThread4(res, key):
+    res[key] = get_block_len()
+
+# 5 - PRECOMMITS RATIO
+def get_sign_ratio():
+    get_precommit_ratio(LATEST_BLOCK)
+def MyThread5(res, key):
+    res[key] = get_block_len()
+
+# 6 - ATOM STAKED BY VALIDATOR
+def get_atom_staked_v():
+    return get_validator_stake(VALIDATOR_ADDRESS)
+def MyThread6(res, key):
+    res[key] = get_atom_staked_v()
+
+# 7 - TOTAL SUPPLY
+def get_total_supply():
+    return get_supply_bonded_ratio()[0]
+def MyThread7(res, key):
+    res[key] = get_total_supply()
+
+# 8 - N ACTIVE VALIDATORS
+def MyThread8(res, key):
+    res[key] = get_n_active_validators() # imported directly from helpers
+
+all_threads = [
+    threading.Thread(target=MyThread0, args=[result, "block_num"]),
+    threading.Thread(target=MyThread1, args=[result, "inflation_rate"]),
+    threading.Thread(target=MyThread2, args=[result, "percent_staked"]),
+    threading.Thread(target=MyThread3, args=[result, "total_block_fees"]),
+    threading.Thread(target=MyThread4, args=[result, "block_len"]),
+    threading.Thread(target=MyThread5, args=[result, "sign_ratio"]),
+    threading.Thread(target=MyThread6, args=[result, "atom_staked_v"]),
+    threading.Thread(target=MyThread7, args=[result, "total_supply"]),
+    threading.Thread(target=MyThread8, args=[result, "n_validators"])
+]
+
+for thread in all_threads:
     thread.start()
+
+for thread in all_threads:
     thread.join()
-    print("thread finished...exiting")
+
+df_ls.append(result)
+pd.DataFrame(df_ls).to_csv('data.csv', index=False)
+
+print("Time taken: ", time.time() - t)

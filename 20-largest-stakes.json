@@ -1,0 +1,106 @@
+{
+  "meta":"JSON file downloaded form Cosmoscan API's /staking/pie endpoint. Date: 20 Oct 2022",
+  "parts": [
+    {
+      "label": "cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en",
+      "title": "Coinbase Custody",
+      "value": "14819876.946973"
+    },
+    {
+      "label": "cosmosvaloper156gqf9837u7d4c4678yt3rl4ls9c5vuursrrzf",
+      "title": "Binance Staking",
+      "value": "11644758.0549317929774387"
+    },
+    {
+      "label": "cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0",
+      "title": "🐠stake.fish",
+      "value": "11189143.623823"
+    },
+    {
+      "label": "cosmosvaloper14lultfckehtszvzw4ehu0apvsr77afvyju5zzy",
+      "title": "DokiaCapital",
+      "value": "10562411.986545"
+    },
+    {
+      "label": "cosmosvaloper196ax4vc0lwpxndu9dyhvca7jhxp70rmcvrj90c",
+      "title": "SG-1",
+      "value": "10161050.539719"
+    },
+    {
+      "label": "cosmosvaloper1z8zjv3lntpwxua0rtpvgrcwl0nm0tltgpgs6l7",
+      "title": "Kraken",
+      "value": "8373937.389054"
+    },
+    {
+      "label": "cosmosvaloper1v5y0tg0jllvxf5c3afml8s3awue0ymju89frut",
+      "title": "Zero Knowledge Validator (ZKV)",
+      "value": "6686532.407629"
+    },
+    {
+      "label": "cosmosvaloper1qaa9zej9a0ge3ugpx3pxyx602lxh3ztqgfnp42",
+      "title": "GAME",
+      "value": "6580380.901867"
+    },
+    {
+      "label": "cosmosvaloper19lss6zgdh5vvcpjhfftdghrpsw7a4434elpwpu",
+      "title": "Paradigm",
+      "value": "6476154.356203"
+    },
+    {
+      "label": "cosmosvaloper1tflk30mq5vgqjdly92kkhhq3raev2hnz6eete3",
+      "title": "Everstake",
+      "value": "6466674.947295"
+    },
+    {
+      "label": "cosmosvaloper1ey69r37gfxvxg62sh4r0ktpuc46pzjrm873ae8",
+      "title": "Sikka",
+      "value": "6319710.4980353464250195"
+    },
+    {
+      "label": "cosmosvaloper14k4pzckkre6uxxyd2lnhnpp8sngys9m6hl6ml7",
+      "title": "Polychain",
+      "value": "6224549.942635"
+    },
+    {
+      "label": "cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d",
+      "title": "Figment",
+      "value": "3895954.732457"
+    },
+    {
+      "label": "cosmosvaloper1clpqr4nrk4khgkxj78fcwwh6dl3uw4epsluffn",
+      "title": "Cosmostation",
+      "value": "3742386.889376"
+    },
+    {
+      "label": "cosmosvaloper132juzk0gdmwuxvx4phug7m3ymyatxlh9734g4w",
+      "title": "P2P.ORG - P2P Validator",
+      "value": "3694330.110041"
+    },
+    {
+      "label": "cosmosvaloper15urq2dtp9qce4fyc85m6upwm9xul3049e02707",
+      "title": "Chorus One",
+      "value": "3552840.138921"
+    },
+    {
+      "label": "cosmosvaloper1vf44d85es37hwl9f4h9gv0e064m0lla60j9luj",
+      "title": "MultiChain ventures",
+      "value": "3308099.0889383789926223"
+    },
+    {
+      "label": "cosmosvaloper1lzhlnpahvznwfv4jmay2tgaha5kmz5qxerarrl",
+      "title": "Citadel.one",
+      "value": "2798465.795489"
+    },
+    {
+      "label": "cosmosvaloper1zqgheeawp7cmqk27dgyctd80rd8ryhqs6la9wc",
+      "title": "NO! Fee to 2025 💸 | melea.xyz",
+      "value": "2469510.145131"
+    },
+    {
+      "label": "cosmosvaloper1g48268mu5vfp4wk7dk89r0wdrakm9p5xk0q50k",
+      "title": "Provalidator",
+      "value": "2450406.063056"
+    }
+  ],
+  "total": "200886473.093279"
+}

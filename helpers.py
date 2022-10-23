@@ -105,8 +105,8 @@ def get_rewards(validator_addr):
     result_dict = {}
     response = response['result']
     
-    result_dict['self_bonded_denom'] = response['self_bond_rewards'][0]['denom']
-    result_dict['self_bonded_amt'] = response['self_bond_rewards'][0]['amount']
+    result_dict['self_bonded_rew_denom'] = response['self_bond_rewards'][0]['denom']
+    result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
     result_dict['commission_denom'] = response['val_commission']['commission'][0]['denom']
     result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
 
@@ -117,5 +117,9 @@ def list_to_dict(ls, keys):
     for i in range(len(ls)):
         d[keys[i]] = ls[i]
     return d
+VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 
-# print(get_validator_stake('cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en'))
+response = requests.get(RPC_URL+'/distribution/validators/'+VALIDATOR_ADDRESS, headers=headers).json()
+print(bcolors.OKBLUE ,response, bcolors.ENDC)
+response = requests.get(RPC_URL+'/distribution/validators/'+VALIDATOR_ADDRESS+'/outstanding_rewards', headers=headers).json()['result']['rewards'][0]['amount']
+print(bcolors.OKCYAN ,response, bcolors.ENDC)

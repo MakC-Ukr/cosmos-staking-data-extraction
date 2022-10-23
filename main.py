@@ -17,14 +17,15 @@ RPC_URL = os.getenv('RPC_URL')
 VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 
 # CONST VALUES - 9,10,11,12,13,17,21
+BLOCKS_PRE_YEAR = 4360000
 CONST_ATTRIBUTES = {
-        "Block_length_target": -1,
+        "Block_length_target": (365*24*60*60)/BLOCKS_PRE_YEAR,
         "Goal_Bonded": 0.6666,
         "Inflation_Rate_Change": 0.13,
         "Min_Inflation_Rate": 0.07,
         "Max_Inflation_Rate": 0.20,
         "Min_Signatures": 0.6666,
-        "Blocks_per_year": -1,
+        "Blocks_per_year": BLOCKS_PRE_YEAR,
         "Validator_id": VALIDATOR_ADDRESS
     }
 

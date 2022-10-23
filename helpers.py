@@ -15,6 +15,10 @@ RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 RANDOM_VALIDATOR_ADDRESS = 'cosmos1c4k24jzduc365kywrsvf5ujz4ya6mwymy8vq4q' # Coinbase custody validator
 headers = {'accept': 'application/json',}
+CMC_headers = {
+    'X-CMC_PRO_API_KEY': '98c35ce7-275c-46d3-9221-1c08ae3caf3f',
+    'Accept': 'application/json',
+}
 
 def get_inflation():    
     response = requests.get(RPC_URL+'/cosmos/mint/v1beta1/inflation', headers=headers).json()
@@ -31,9 +35,14 @@ def get_timestamp(block_number = -1):
 
 
 def get_supply_bonded_ratio():
-    response = requests.get(RPC_URL+ '/cosmos/staking/v1beta1/pool', headers=headers).json()['pool']
-    total_sup = float(response['bonded_tokens']) +  float(response['not_bonded_tokens'])
-    bond_ratio = float(response['bonded_tokens']) / total_sup
+    bonded_tokens = float(requests.get(RPC_URL+ '/cosmos/staking/v1beta1/pool', headers=headers).json()['pool']['bonded_tokens'])/1e6
+    CMC_params = {
+        'id': '3794',
+    }
+    total_sup = float(requests.get('https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest', params=CMC_params, headers=CMC_headers).json()['data']['3794']['circulating_supply'])
+    # print("total supply: ", total_sup)
+    # print("bonded tokens: ", bonded_tokens)
+    bond_ratio = float(bonded_tokens) / total_sup
     return (total_sup, bond_ratio)
 
 # returns total validator set size (425)
@@ -107,4 +116,6 @@ def list_to_dict(ls, keys):
         d[keys[i]] = ls[i]
     return d
 
-print(get_rewards('cosmos1c4k24jzduc365kywrsvf5ujz4ya6mwymy8vq4q'))
+t = time.time()
+print(get_supply_bonded_ratio())
+print(time.time()-t)

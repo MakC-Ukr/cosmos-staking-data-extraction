@@ -13,12 +13,22 @@ from random import sample
 load_dotenv()
 RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
-RANDOM_VALIDATOR_ADDRESS = 'cosmos1c4k24jzduc365kywrsvf5ujz4ya6mwymy8vq4q' # Coinbase custody validator
 headers = {'accept': 'application/json',}
 CMC_headers = {
     'X-CMC_PRO_API_KEY': '98c35ce7-275c-46d3-9221-1c08ae3caf3f',
     'Accept': 'application/json',
 }
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 
 def get_inflation():    
     response = requests.get(RPC_URL+'/cosmos/mint/v1beta1/inflation', headers=headers).json()
@@ -35,15 +45,11 @@ def get_timestamp(block_number = -1):
 
 
 def get_supply_bonded_ratio():
-    bonded_tokens = float(requests.get(RPC_URL+ '/cosmos/staking/v1beta1/pool', headers=headers).json()['pool']['bonded_tokens'])/1e6
-    CMC_params = {
-        'id': '3794',
+    params = {
+        'by': 'hour',
     }
-    total_sup = float(requests.get('https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest', params=CMC_params, headers=CMC_headers).json()['data']['3794']['circulating_supply'])
-    # print("total supply: ", total_sup)
-    # print("bonded tokens: ", bonded_tokens)
-    bond_ratio = float(bonded_tokens) / total_sup
-    return (total_sup, bond_ratio)
+    bond_ratio = requests.get('https://api.cosmoscan.net/bonded-ratio/agg', params=params, headers=headers).json()[-1]['value']
+    return bond_ratio
 
 # returns total validator set size (425)
 def get_n_validators():
@@ -67,18 +73,15 @@ def get_fees_collected(block_number=-1):
     response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()['txs']
     fees_collected = 0
     if(response is None):
-        print("No fees collected in block: ", block_number)
+        print(bcolors.WARNING, "No fees collected in block: ", block_number, bcolors.ENDC)
         return 0
     for tx in response:
         fees_collected += float(tx['fee'])
     return fees_collected
 
 def get_validator_stake(validator_addr):    
-    validator_set = requests.get(COSMOSCAN_API+'/validators', headers=headers).json() 
-    for val in validator_set:
-        if val['acc_address'] == validator_addr:
-            return int(float(val['power']))
-    raise Exception('My_Exception: Validator not found')
+    stake_val = requests.get(COSMOSCAN_API+'/validator/'+validator_addr, headers=headers).json()['power']
+    return stake_val
 
 # 2 API requests are made inside this function
 def get_precommit_ratio(block_num):
@@ -97,7 +100,6 @@ def get_chain_distribution_parameters():
     return result_dict
 
 # returns a dictionary of information: block number, denomination fo rewards, rewards accrued based on self-stake and based on delegation stakes
-
 def get_rewards(validator_addr):
     response = requests.get(RPC_URL+'/distribution/validators/'+validator_addr, headers=headers).json()
     result_dict = {}
@@ -116,6 +118,4 @@ def list_to_dict(ls, keys):
         d[keys[i]] = ls[i]
     return d
 
-t = time.time()
-print(get_supply_bonded_ratio())
-print(time.time()-t)
+# print(get_validator_stake('cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en'))

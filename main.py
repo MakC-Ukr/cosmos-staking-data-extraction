@@ -6,7 +6,7 @@ from threading import Thread
 from time import sleep
 from dotenv import load_dotenv
 import requests
-from helpers import get_rewards, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_fees_collected, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict
+from helpers import bcolors, get_rewards, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_fees_collected, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict
 
 # Loading prerequisites
 load_dotenv()
@@ -42,7 +42,7 @@ def MyThread1(res, key):
 
 # 2 - PERCENTAGE ATOM STAKED
 def MyThread2(res, key):
-    res[key] = get_supply_bonded_ratio()[1]
+    res[key] = get_supply_bonded_ratio()
 
 # 3, 20 - BLOCK FEES and txFees
 def MyThread3(res, key, _latest_block):
@@ -60,9 +60,9 @@ def MyThread5(res, key, _latest_block):
 def MyThread6(res, key):
     res[key] = get_validator_stake(VALIDATOR_ADDRESS)
 
-# 7 - TOTAL SUPPLY
+# 7 - TOTAL SUPPLY - THIS IS WRONG
 def MyThread7(res, key):
-    res[key] = get_supply_bonded_ratio()[0]
+    res[key] = get_supply_bonded_ratio()
 
 # 8 - N ACTIVE VALIDATORS
 def MyThread8(res, key):
@@ -107,8 +107,8 @@ def get_all_block_data(LATEST_BLOCK):
     df_ls.append(result)
     pd.DataFrame(df_ls).to_csv('data.csv', index=False)
 
-    print("Time taken for block : ", LATEST_BLOCK, ": ", time.time() - t)
-
+    print(bcolors.OKCYAN, "Time taken for block : ", LATEST_BLOCK, ": ", time.time() - t, bcolors.ENDC)
+    print()
 
 while(True):
     past_block_num = 0
@@ -116,7 +116,7 @@ while(True):
     while past_block_num == new_block:
         time.sleep(2)
         new_block = int(requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height']) # gets latest block number
-    
-    print("New block = ", new_block)
+
+    print(bcolors.OKCYAN, "BLOCK ", new_block, bcolors.ENDC)
     get_all_block_data(new_block)
     past_block_num = new_block

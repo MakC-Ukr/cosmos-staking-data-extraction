@@ -109,7 +109,6 @@ def get_rewards(validator_addr):
     result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
     result_dict['commission_denom'] = response['val_commission']['commission'][0]['denom']
     result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
-
     return result_dict
 
 def list_to_dict(ls, keys):
@@ -119,7 +118,12 @@ def list_to_dict(ls, keys):
     return d
 VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 
-response = requests.get(RPC_URL+'/distribution/validators/'+VALIDATOR_ADDRESS, headers=headers).json()
-print(bcolors.OKBLUE ,response, bcolors.ENDC)
-response = requests.get(RPC_URL+'/distribution/validators/'+VALIDATOR_ADDRESS+'/outstanding_rewards', headers=headers).json()['result']['rewards'][0]['amount']
-print(bcolors.OKCYAN ,response, bcolors.ENDC)
+def get_total_supply():
+    response = requests.get(RPC_URL+'/staking/pool', headers=headers).json()['result']
+    bond = float(response['bonded_tokens'])
+    unbond = float(response['not_bonded_tokens'])*10
+    return bond+unbond
+
+def get_block_time(bl_num):
+    response = requests.get(RPC_URL+'/blocks/'+str(bl_num), headers=headers).json()['block']['header']['time']
+    return response

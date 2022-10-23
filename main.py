@@ -121,7 +121,6 @@ new_block = 0
 
 while(True):
     while past_block_num == new_block:
-        time.sleep(1)
         new_block = int(requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height']) # gets latest block number
     print(bcolors.OKCYAN, "BLOCK ", new_block, bcolors.ENDC)
     get_all_block_data(new_block)

@@ -11,6 +11,7 @@ from random import sample
 
 # Load env variables
 load_dotenv()
+MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 headers = {'accept': 'application/json',}
@@ -60,25 +61,6 @@ def get_n_active_validators():
     validator_set = requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total']
     return int(validator_set)
 
-def get_fees_collected(block_number=-1):    
-    if block_number == -1:
-        block_number = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height'] # gets latest block number
-        print("-1 passed")
-
-    # following RPC API returns block info but does not include tx hashes or fees
-    # response = requests.get('https://api.cosmos.network/blocks/'+str(block_number), headers=headers)
-    # response = response.json()['block']['data']['txs']
-    
-    # Cosmoscan API returns number of txns but isn't currently returning txn data (probably server side error- because returns for very old blocks)
-    response = requests.get(COSMOSCAN_API+'/block/'+str(block_number), headers=headers).json()['txs']
-    fees_collected = 0
-    if(response is None):
-        print(bcolors.WARNING, "No fees collected in block: ", block_number, bcolors.ENDC)
-        return 0
-    for tx in response:
-        fees_collected += float(tx['fee'])
-    return fees_collected
-
 def get_validator_stake(validator_addr):    
     stake_val = requests.get(COSMOSCAN_API+'/validator/'+validator_addr, headers=headers).json()['power']
     return stake_val
@@ -127,3 +109,18 @@ def get_total_supply():
 def get_block_time(bl_num):
     response = requests.get(RPC_URL+'/blocks/'+str(bl_num), headers=headers).json()['block']['header']['time']
     return response
+
+def get_fees_collected(block_number):    
+    time.sleep(3)
+    params = {
+        'limit': '30',
+    }
+    response = requests.get('https://api.cosmostation.io/v1/txs', params=params, headers=headers).json()
+    total_fees = 0
+
+    for tx in response:
+        act_block_height = tx['data']['height']
+        act_fee = float(tx['data']['tx']['auth_info']['fee']['amount'][0]['amount'])
+        if act_block_height == str(block_number):
+            total_fees+=act_fee
+    return total_fees

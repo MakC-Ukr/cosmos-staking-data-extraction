@@ -101,10 +101,8 @@ def list_to_dict(ls, keys):
 VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 
 def get_total_supply():
-    response = requests.get(RPC_URL+'/staking/pool', headers=headers).json()['result']
-    bond = float(response['bonded_tokens'])
-    unbond = float(response['not_bonded_tokens'])*10
-    return bond+unbond
+    response = requests.get(RPC_URL+'/cosmos/bank/v1beta1/supply/uatom', headers=headers).json()['amount']['amount']
+    return response
 
 def get_block_time(bl_num):
     response = requests.get(RPC_URL+'/blocks/'+str(bl_num), headers=headers).json()['block']['header']['time']

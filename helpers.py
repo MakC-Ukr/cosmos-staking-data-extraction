@@ -14,6 +14,7 @@ load_dotenv()
 MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
+VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 headers = {'accept': 'application/json',}
 CMC_headers = {
     'X-CMC_PRO_API_KEY': '98c35ce7-275c-46d3-9221-1c08ae3caf3f',
@@ -98,7 +99,6 @@ def list_to_dict(ls, keys):
     for i in range(len(ls)):
         d[keys[i]] = ls[i]
     return d
-VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 
 def get_total_supply():
     response = requests.get(RPC_URL+'/cosmos/bank/v1beta1/supply/uatom', headers=headers).json()['amount']['amount']
@@ -122,3 +122,12 @@ def get_fees_collected(block_number):
         if act_block_height == str(block_number):
             total_fees+=act_fee
     return total_fees
+
+def get_validator_commission(validator_addr):
+    response = requests.get(RPC_URL+f'/cosmos/staking/v1beta1/validators/{validator_addr}', headers=headers).json()['validator']['commission']['commission_rates']['rate']
+    response = float(response)*100
+    return response
+
+# t = time.time()
+# print(get_validator_commission(VALIDATOR_ADDRESS))
+# print(time.time()-t)

@@ -6,7 +6,7 @@ from threading import Thread
 from time import sleep
 from dotenv import load_dotenv
 import requests
-from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_fees_collected, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict
+from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_fees_collected, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 
 # Loading prerequisites
 load_dotenv()
@@ -49,7 +49,7 @@ def MyThread2(res, key):
 def MyThread3(res, key, _latest_block):
     res[key] = get_fees_collected(_latest_block)
 
-# 4 - BLOCK LENGTH
+# 4 - block timestamp
 def MyThread4(res, key, _latest_block):
     res[key] = get_timestamp(_latest_block)
 
@@ -81,9 +81,9 @@ def MyThread10(res, validator_addr):
     for key in result_dict.keys():
         res[key] = result_dict[key]
 
-# 3 - Block time
-def MyThread11(res, key, _latest_block):
-    res[key] = get_timestamp(_latest_block)
+# 22 - validator commission
+def MyThread11(res, key, validator_addr):
+    res[key] = get_validator_commission(validator_addr)
 
 def get_all_block_data(LATEST_BLOCK):
     result = {}
@@ -93,14 +93,14 @@ def get_all_block_data(LATEST_BLOCK):
         threading.Thread(target=MyThread1, args=[result, "inflation_rate"]),
         threading.Thread(target=MyThread2, args=[result, "percent_staked"]),
         threading.Thread(target=MyThread3, args=[result, "total_block_fees", LATEST_BLOCK]),
-        threading.Thread(target=MyThread4, args=[result, "block_len", LATEST_BLOCK]),
+        threading.Thread(target=MyThread4, args=[result, "timestamp", LATEST_BLOCK]),
         threading.Thread(target=MyThread5, args=[result, "sign_ratio", LATEST_BLOCK]),
         threading.Thread(target=MyThread6, args=[result, "atom_staked_v"]),
         threading.Thread(target=MyThread7, args=[result, "total_supply"]),
         threading.Thread(target=MyThread8, args=[result, "n_validators"]),
         threading.Thread(target=MyThread9, args=[result]),
         threading.Thread(target=MyThread10, args=[result, VALIDATOR_ADDRESS]),
-        threading.Thread(target=MyThread11, args=[result, "timestamp", LATEST_BLOCK])
+        threading.Thread(target=MyThread11, args=[result, "v_commission", VALIDATOR_ADDRESS])
     ]
 
     t = time.time()

@@ -2,3 +2,4 @@ venv/
 .env
 data.csv
 TODO
+data_cache/

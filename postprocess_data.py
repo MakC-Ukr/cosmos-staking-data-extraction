@@ -1,7 +1,9 @@
 import pandas as pd
 import datetime
+import os
 
 DEFAULT_BLOCK_TIME = 6.12345
+
 
 def time_to_unix(time):
     year = int(time.split('-')[0])
@@ -16,20 +18,23 @@ def time_to_unix(time):
     unix_timestamp+=millisecs
     return unix_timestamp
 
-df = pd.read_csv("data.csv")
-new_df_ls = []
-prev_timestamp = time_to_unix(df.iloc[0]["timestamp"])
-last_block_num = df.iloc[0]["block_num"]
-for ind, row in df.iterrows():
-    if ind == 0:
-        row['block_len'] = DEFAULT_BLOCK_TIME
-    elif row['block_num'] != last_block_num+1:
-        row['block_len'] = DEFAULT_BLOCK_TIME
-    else:
-        row['block_len'] = float(time_to_unix(row['timestamp']) - prev_timestamp)/1000.0
-    new_df_ls.append(row)
-    prev_timestamp = time_to_unix(row['timestamp'])
-    last_block_num = row['block_num']
+def post_process_data():
+    dir_path = os.path.abspath('')+'/data.csv'
+    df = pd.read_csv(dir_path)
+    new_df_ls = []
+    prev_timestamp = time_to_unix(df.iloc[0]["timestamp"])
+    last_block_num = df.iloc[0]["block_num"]
+    for ind, row in df.iterrows():
+        if ind == 0:
+            row['block_len'] = DEFAULT_BLOCK_TIME
+        elif row['block_num'] != last_block_num+1:
+            row['block_len'] = DEFAULT_BLOCK_TIME
+        else:
+            row['block_len'] = float(time_to_unix(row['timestamp']) - prev_timestamp)/1000.0
+        new_df_ls.append(row)
+        prev_timestamp = time_to_unix(row['timestamp'])
+        last_block_num = row['block_num']
 
-new_df = pd.DataFrame(new_df_ls)
-new_df.to_csv("processed_data.csv", index=False)
+    new_df = pd.DataFrame(new_df_ls)
+    dir_path = os.path.abspath('')+'/processed_data.csv'
+    new_df.to_csv(dir_path, index=False)

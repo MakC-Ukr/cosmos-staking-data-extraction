@@ -87,19 +87,8 @@ def get_rewards(validator_addr):
     response = requests.get(RPC_URL+'/distribution/validators/'+validator_addr, headers=headers).json()
     result_dict = {}
     response = response['result']
-    # result_dict['self_bonded_rew_denom'] = response['self_bond_rewards'][0]['denom']
-    try:
-        result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
-    except:
-        result_dict['self_bonded_rew_amt'] = 0
-        print(bcolors.WARNING, "Couldn't get self_bonded_rew_amt for ", validator_addr, ". Returned 0", bcolors.ENDC)
-    # result_dict['commission_denom'] = response['val_commission']['commission'][0]['denom']
-    try:
-        result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
-    except:
-        result_dict['commission_amt'] = 0
-        print(bcolors.WARNING, "Couldn't get commission_amt for ", validator_addr, ". Returned 0", bcolors.ENDC)
-
+    result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
+    result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
     return result_dict
 
 def list_to_dict(ls, keys):

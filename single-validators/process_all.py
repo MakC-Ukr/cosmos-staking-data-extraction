@@ -27,7 +27,8 @@ for ind, row in df.iterrows():
     if ind == 0:
         row['block_len'] = DEFAULT_BLOCK_TIME
     elif row['block_num'] != last_block_num+1:
-        row['block_len'] = DEFAULT_BLOCK_TIME
+        time_diff = float(time_to_unix(row['timestamp']) - prev_timestamp)/1000.0
+        row['block_len'] = time_diff/float(row['block_num'] - last_block_num)
     else:
         row['block_len'] = float(time_to_unix(row['timestamp']) - prev_timestamp)/1000.0
     new_df_ls.append(row)

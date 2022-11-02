@@ -13,6 +13,7 @@ from random import sample
 load_dotenv()
 MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
+RPC_URL_2 = os.getenv('RPC_URL_2')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 headers = {'accept': 'application/json',}
@@ -20,6 +21,9 @@ CMC_headers = {
     'X-CMC_PRO_API_KEY': '98c35ce7-275c-46d3-9221-1c08ae3caf3f',
     'Accept': 'application/json',
 }
+# N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])
+# print("n_active_validators: ", N_ACTIVE_VALIDATORS)
+##
 class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -67,15 +71,13 @@ def get_validator_stake(validator_addr):
     return stake_val
 
 # 2 API requests are made inside this function
-def get_precommit_ratio(block_num):
-    active_validators = get_n_active_validators()
-    response = requests.get(RPC_URL+'/blocks/'+str(block_num), headers=headers).json()['block']['last_commit']['signatures']
-    ratio = len(response)/active_validators
+def get_precommit_ratio(num_signatures):
+    response = len(requests.get(RPC_URL+'/blocks/'+str(num_signatures), headers=headers).json()['block']['last_commit']['signatures'])
     return ratio
 
 # returns a dictionary containing: community tax to be paid, miniumum proposer bonus, and maximum proposer bonus
 def get_chain_distribution_parameters():
-    response = requests.get(RPC_URL+'/distribution/parameters', headers=headers).json()['result']
+    response = requests.get(RPC_URL_2+'/distribution/parameters', headers=headers).json()['result']
     result_dict = {}
     result_dict['community_tax'] = response['community_tax']
     result_dict['min_proposer_bonus'] = response['base_proposer_reward']
@@ -84,7 +86,7 @@ def get_chain_distribution_parameters():
 
 # returns a dictionary of information: block number, denomination fo rewards, rewards accrued based on self-stake and based on delegation stakes
 def get_rewards(validator_addr):
-    response = requests.get(RPC_URL+'/distribution/validators/'+validator_addr, headers=headers).json()
+    response = requests.get(RPC_URL_2+'/distribution/validators/'+validator_addr, headers=headers).json()
     result_dict = {}
     response = response['result']
     result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
@@ -106,7 +108,6 @@ def get_block_time(bl_num):
     return response
 
 def get_fees_collected(block_number):    
-    time.sleep(3)
     params = {
         'limit': '30',
     }
@@ -120,8 +121,19 @@ def get_fees_collected(block_number):
             total_fees+=act_fee
     return total_fees
 
+def get_total_fees(_block_num):
+    params = {
+        'events': 'tx.height='+str(_block_num),
+        'pagination.limit': '20',
+    }
+    response = requests.get('https://api.cosmos.network/cosmos/tx/v1beta1/txs', params=params, headers=headers).json()['tx_responses']
+    total_fees = 0
+    for i in response:
+        total_fees += int(i['tx']['auth_info']['fee']['amount'][0]['amount'])
+    return total_fees
+
 def get_validator_commission(validator_addr):
-    response = requests.get(RPC_URL+f'/cosmos/staking/v1beta1/validators/{validator_addr}', headers=headers).json()['validator']['commission']['commission_rates']['rate']
+    response = requests.get(RPC_URL_2+f'/cosmos/staking/v1beta1/validators/{validator_addr}', headers=headers).json()['validator']['commission']['commission_rates']['rate']
     response = float(response)*100
     return response
 

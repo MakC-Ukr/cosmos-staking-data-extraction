@@ -17,7 +17,7 @@ def time_to_unix(time):
     unix_timestamp+=millisecs
     return unix_timestamp
 
-file_name = "Coinbase.csv"
+file_name = "Twinstake.csv"
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name
 df = pd.read_csv(dir_path)
 new_df_ls = []

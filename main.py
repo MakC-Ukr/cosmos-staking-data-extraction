@@ -19,28 +19,28 @@ BLOCKS_TO_RUN_FOR = 300 # 10 mins = ~100 blocks
 
 
 TOP20_VALIDATORS = [
-    'cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en', # Coinbase Custody
-    'cosmosvaloper156gqf9837u7d4c4678yt3rl4ls9c5vuursrrzf', # Binance Staking
-    'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0', # stake.fish
-    'cosmosvaloper14lultfckehtszvzw4ehu0apvsr77afvyju5zzy', # Dokia Fish
-    'cosmosvaloper196ax4vc0lwpxndu9dyhvca7jhxp70rmcvrj90c', # SG-1
-    'cosmosvaloper1z8zjv3lntpwxua0rtpvgrcwl0nm0tltgpgs6l7', # Kraken
-    'cosmosvaloper1v5y0tg0jllvxf5c3afml8s3awue0ymju89frut', # Zero Knowledge Validator
-    'cosmosvaloper1qaa9zej9a0ge3ugpx3pxyx602lxh3ztqgfnp42', # Game
-    'cosmosvaloper1tflk30mq5vgqjdly92kkhhq3raev2hnz6eete3', # Everstake
-    'cosmosvaloper19lss6zgdh5vvcpjhfftdghrpsw7a4434elpwpu', # Paradigm
-    'cosmosvaloper1ey69r37gfxvxg62sh4r0ktpuc46pzjrm873ae8', # Sikka
-    'cosmosvaloper14k4pzckkre6uxxyd2lnhnpp8sngys9m6hl6ml7', # Polychain
-    'cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d', # Figment
-    'cosmosvaloper1clpqr4nrk4khgkxj78fcwwh6dl3uw4epsluffn', # Cosmostation
-    'cosmosvaloper132juzk0gdmwuxvx4phug7m3ymyatxlh9734g4w', # P2P.ORG - P2P Validator
-    'cosmosvaloper15urq2dtp9qce4fyc85m6upwm9xul3049e02707', # Chorus One
-    'cosmosvaloper1vf44d85es37hwl9f4h9gv0e064m0lla60j9luj', # MultiChain ventures
-    'cosmosvaloper1lzhlnpahvznwfv4jmay2tgaha5kmz5qxerarrl', # Citadel.one
-    'cosmosvaloper1zqgheeawp7cmqk27dgyctd80rd8ryhqs6la9wc', # NO! Fee to 2025 💸 | melea.xyz
-    'cosmosvaloper1g48268mu5vfp4wk7dk89r0wdrakm9p5xk0q50k', # Provalidator
+    # 'cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en', # Coinbase Custody
+    # 'cosmosvaloper156gqf9837u7d4c4678yt3rl4ls9c5vuursrrzf', # Binance Staking
+    # 'cosmosvaloper1sjllsnramtg3ewxqwwrwjxfgc4n4ef9u2lcnj0', # stake.fish
+    # 'cosmosvaloper14lultfckehtszvzw4ehu0apvsr77afvyju5zzy', # Dokia Fish
+    # 'cosmosvaloper196ax4vc0lwpxndu9dyhvca7jhxp70rmcvrj90c', # SG-1
+    # 'cosmosvaloper1z8zjv3lntpwxua0rtpvgrcwl0nm0tltgpgs6l7', # Kraken
+    # 'cosmosvaloper1v5y0tg0jllvxf5c3afml8s3awue0ymju89frut', # Zero Knowledge Validator
+    # 'cosmosvaloper1qaa9zej9a0ge3ugpx3pxyx602lxh3ztqgfnp42', # Game
+    # 'cosmosvaloper1tflk30mq5vgqjdly92kkhhq3raev2hnz6eete3', # Everstake
+    # 'cosmosvaloper19lss6zgdh5vvcpjhfftdghrpsw7a4434elpwpu', # Paradigm
+    # 'cosmosvaloper1ey69r37gfxvxg62sh4r0ktpuc46pzjrm873ae8', # Sikka
+    # 'cosmosvaloper14k4pzckkre6uxxyd2lnhnpp8sngys9m6hl6ml7', # Polychain
+    # 'cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d', # Figment
+    # 'cosmosvaloper1clpqr4nrk4khgkxj78fcwwh6dl3uw4epsluffn', # Cosmostation
+    # 'cosmosvaloper132juzk0gdmwuxvx4phug7m3ymyatxlh9734g4w', # P2P.ORG - P2P Validator
+    # 'cosmosvaloper15urq2dtp9qce4fyc85m6upwm9xul3049e02707', # Chorus One
+    # 'cosmosvaloper1vf44d85es37hwl9f4h9gv0e064m0lla60j9luj', # MultiChain ventures
+    # 'cosmosvaloper1lzhlnpahvznwfv4jmay2tgaha5kmz5qxerarrl', # Citadel.one
+    # 'cosmosvaloper1zqgheeawp7cmqk27dgyctd80rd8ryhqs6la9wc', # NO! Fee to 2025 💸 | melea.xyz
+    # 'cosmosvaloper1g48268mu5vfp4wk7dk89r0wdrakm9p5xk0q50k', # Provalidator
     'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', # Twinstake Validator
-    'cosmosvaloper1uxlf7mvr8nep3gm7udf2u9remms2jyjqvwdul2', # Kiln.fi
+    # 'cosmosvaloper1uxlf7mvr8nep3gm7udf2u9remms2jyjqvwdul2', # Kiln.fi
 ]
 
 # CONST VALUES - 9,10,11,12,13,17,21
@@ -113,13 +113,10 @@ def MyThread6(res, validator_list):
 
 # @param validator_addr - address of the validator for which we are fetching the rewards
 # @param validator_index - index of the validator in TOP20_VALIDATORS for adding the prefix v1_, v2_ etc.
-# def MyThread_R1(res, validator_addr, validator_index):
-#     result_dict = get_rewards(validator_addr)
-#     for key in result_dict.keys():
-#         res["v"+ str(validator_index) + key] = result_dict[key]
-# all_threads.extend(
-#     [threading.Thread(target=MyThread_R1, args=[result, validator_addr, i]) for i, validator_addr in enumerate(TOP20_VALIDATORS)]
-# )
+def MyThread_R1(res, validator_addr, validator_index):
+    result_dict = get_rewards(validator_addr)
+    for key in result_dict.keys():
+        res["v"+ str(validator_index) + key] = result_dict[key]
 
 
 # Uncomment the following thread and run it if you have a small validator set (this will run the API calls sequentially)
@@ -148,6 +145,10 @@ def get_all_block_data(LATEST_BLOCK):
         # threading.Thread(target=MyThread_R1, args=[result, TOP20_VALIDATORS])
     ]
 
+    all_threads.extend(
+        [threading.Thread(target=MyThread_R1, args=[result, validator_addr, i]) for i, validator_addr in enumerate(TOP20_VALIDATORS)]
+    )  
+
     t = time.time()
     for thread in all_threads:
         thread.start()
@@ -167,18 +168,18 @@ new_block = 0
 
 count_blocks = 0
 
-rewards_before_list = {}
-for ind, i in enumerate(TOP20_VALIDATORS):
-    done = False
-    while(not done):
-        try:
-            print(ind, ". ", i)
-            result_dict = get_rewards(i)
-            rewards_before_list[i] = result_dict
-            time.sleep(1)
-            done = True
-        except:
-            time.sleep(2)
+# rewards_before_list = {}
+# for ind, i in enumerate(TOP20_VALIDATORS):
+#     done = False
+#     while(not done):
+#         try:
+#             print(ind, ". ", i)
+#             result_dict = get_rewards(i)
+#             rewards_before_list[i] = result_dict
+#             time.sleep(1)
+#             done = True
+#         except:
+#             time.sleep(2)
 
 while(count_blocks < BLOCKS_TO_RUN_FOR):
     while past_block_num == new_block:
@@ -188,28 +189,28 @@ while(count_blocks < BLOCKS_TO_RUN_FOR):
     past_block_num = new_block
     count_blocks+=1
 
-rewards_after_list = {}
-for ind, i in enumerate(TOP20_VALIDATORS):
-    done = False
-    while(not done):
-        try:
-            print(ind, ". ", i)
-            result_dict = get_rewards(i)
-            rewards_after_list[i] = result_dict
-            time.sleep(1)
-            done = True
-        except:
-            time.sleep((2))
+# rewards_after_list = {}
+# for ind, i in enumerate(TOP20_VALIDATORS):
+#     done = False
+#     while(not done):
+#         try:
+#             print(ind, ". ", i)
+#             result_dict = get_rewards(i)
+#             rewards_after_list[i] = result_dict
+#             time.sleep(1)
+#             done = True
+#         except:
+#             time.sleep((2))
 
-df_ls = []
-for i in TOP20_VALIDATORS:
-    df_ls.append({
-        "validator": i,
-        "self_bond": float(rewards_after_list[i]['self_bonded_rew_amt'])-float(rewards_before_list[i]['self_bonded_rew_amt']),
-        'commision': float(rewards_after_list[i]['commission_amt'])-float(rewards_before_list[i]['commission_amt']),
-    })
+# df_ls = []
+# for i in TOP20_VALIDATORS:
+#     df_ls.append({
+#         "validator": i,
+#         "self_bond": float(rewards_after_list[i]['self_bonded_rew_amt'])-float(rewards_before_list[i]['self_bonded_rew_amt']),
+#         'commision': float(rewards_after_list[i]['commission_amt'])-float(rewards_before_list[i]['commission_amt']),
+#     })
 
-dir_path = os.path.abspath('')+'/rewards20.csv'
-pd.DataFrame(df_ls).to_csv(dir_path, index=False)
+# dir_path = os.path.abspath('')+'/rewards20.csv'
+# pd.DataFrame(df_ls).to_csv(dir_path, index=False)
 
-post_process_data()
+# post_process_data()

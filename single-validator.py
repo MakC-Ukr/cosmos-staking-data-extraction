@@ -10,13 +10,13 @@ from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_
 
 # Loading prerequisites
 load_dotenv()
-VALIDATOR_NAME = "Coinbase"
+VALIDATOR_NAME = "Twinstake"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single-validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
 df_ls = df.to_dict('records')
 COLUMN_NAMES = list(df.columns)
 RPC_URL = os.getenv('RPC_URL')
-VALIDATOR_ADDRESS= "cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en"
+VALIDATOR_ADDRESS= "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69"
 # CONST VALUES - 9,10,11,12,13,17,21
 BLOCKS_PRE_YEAR = 4360000
 CONST_ATTRIBUTES = {

@@ -19,7 +19,9 @@ def time_to_unix(time):
     return unix_timestamp
 
 def post_process_data():
-    dir_path = os.path.abspath('')+'/data.csv'
+    dir_path = os.path.dirname(os.path.realpath(__file__))+'/data.csv'
+    dir_path_output = os.path.abspath('')+'/processed_data.csv'
+
     df = pd.read_csv(dir_path)
     new_df_ls = []
     prev_timestamp = time_to_unix(df.iloc[0]["timestamp"])
@@ -28,7 +30,8 @@ def post_process_data():
         if ind == 0:
             row['block_len'] = DEFAULT_BLOCK_TIME
         elif row['block_num'] != last_block_num+1:
-            row['block_len'] = DEFAULT_BLOCK_TIME
+            time_diff = float(time_to_unix(row['timestamp']) - prev_timestamp)/1000.0
+            row['block_len'] = time_diff/float(row['block_num'] - last_block_num)
         else:
             row['block_len'] = float(time_to_unix(row['timestamp']) - prev_timestamp)/1000.0
         new_df_ls.append(row)
@@ -36,5 +39,4 @@ def post_process_data():
         last_block_num = row['block_num']
 
     new_df = pd.DataFrame(new_df_ls)
-    dir_path = os.path.abspath('')+'/processed_data.csv'
-    new_df.to_csv(dir_path, index=False)
+    new_df.to_csv(dir_path_output, index=False)

@@ -7,15 +7,18 @@ from time import sleep
 from dotenv import load_dotenv
 import requests
 from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from single_validators.process_all import process_all
 
 # Loading prerequisites
 load_dotenv()
+N_BLOCKS_TO_GET = 20
 VALIDATOR_NAME = "Twinstake"
-dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single-validators/{VALIDATOR_NAME}.csv'
+dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
 df_ls = df.to_dict('records')
 COLUMN_NAMES = list(df.columns)
 RPC_URL = os.getenv('RPC_URL')
+RPC_URL_2 = os.getenv('RPC_URL_2')
 VALIDATOR_ADDRESS= "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69"
 N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])
 print("Loaded libraries...")
@@ -58,7 +61,6 @@ def MyThread2(res, key):
 def MyThread3(res, key, _latest_block):
     t = time.time()
     res[key] = get_total_fees(_latest_block)
-    res[key] = 14916
     print(time.time()-t, "s for thread 3")
 
 # 4 - block timestamp
@@ -117,8 +119,9 @@ def MyThread11(res, key, validator_addr):
     print(time.time()-t, "s for thread 11")
 
 def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp):
+    t = time.time()
+    print(bcolors.OKCYAN, "BLOCK ", LATEST_BLOCK, bcolors.ENDC)
     result = {}
-
     all_threads = [
         threading.Thread(target=MyThread0, args=[result, LATEST_BLOCK]),
         threading.Thread(target=MyThread1, args=[result, "inflation_rate"]),
@@ -134,7 +137,6 @@ def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp):
         threading.Thread(target=MyThread11, args=[result, "v_commission", VALIDATOR_ADDRESS])
     ]
 
-    t = time.time()
     for thread in all_threads:
         thread.start()
 
@@ -151,13 +153,28 @@ past_block_num = 0
 new_block = 0
 num_signatures = 0
 time_stamp = 0
-while(True):
+got_blocks=0
+threads_to_stop = []
+while(got_blocks < N_BLOCKS_TO_GET):
     while past_block_num == new_block:
-        resp = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json() # gets latest block number
+        resp = requests.get(RPC_URL_2+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json() # gets latest block number
         new_block = int(resp['block']['header']['height'])
         print(new_block)
         num_signatures=len(resp['block']['last_commit']['signatures'])
         time_stamp = resp['block']['header']['time']
-    print(bcolors.OKCYAN, "BLOCK ", new_block, bcolors.ENDC)
-    get_all_block_data(new_block, num_signatures, time_stamp)
+        time.sleep(1)
+
+    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
+    new_block_thread.start()
+    # new_block_thread.join()
+    threads_to_stop.append(new_block_thread)
     past_block_num = new_block
+    got_blocks+=1
+
+print("End of Data Collection")
+
+for i in threads_to_stop:
+    i.join()
+
+process_all(VALIDATOR_NAME+'.csv')
+print("Done")

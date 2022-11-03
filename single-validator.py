@@ -1,8 +1,8 @@
 import time
 import threading
 import pandas as pd
-import os
 from threading import Thread
+import os
 from time import sleep
 from dotenv import load_dotenv
 import requests
@@ -11,7 +11,7 @@ from single_validators.process_all import process_all
 
 # Loading prerequisites
 load_dotenv()
-N_BLOCKS_TO_GET = 20
+N_BLOCKS_TO_GET = 100
 VALIDATOR_NAME = "Twinstake"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
@@ -157,17 +157,17 @@ got_blocks=0
 threads_to_stop = []
 while(got_blocks < N_BLOCKS_TO_GET):
     while past_block_num == new_block:
-        resp = requests.get(RPC_URL_2+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json() # gets latest block number
+        resp = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json() # gets latest block number
         new_block = int(resp['block']['header']['height'])
         print(new_block)
         num_signatures=len(resp['block']['last_commit']['signatures'])
         time_stamp = resp['block']['header']['time']
         time.sleep(1)
 
-    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
-    new_block_thread.start()
-    # new_block_thread.join()
-    threads_to_stop.append(new_block_thread)
+    # new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
+    # new_block_thread.start()
+    # threads_to_stop.append(new_block_thread)
+    get_all_block_data(new_block, num_signatures, time_stamp)
     past_block_num = new_block
     got_blocks+=1
 

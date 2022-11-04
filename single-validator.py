@@ -157,6 +157,7 @@ time_stamp = 0
 got_blocks=0
 threads_to_stop = []
 while(got_blocks < N_BLOCKS_TO_GET):
+    print("beginning thread ", got_blocks)
     while past_block_num == new_block:
         resp = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json() # gets latest block number
         new_block = int(resp['block']['header']['height'])
@@ -166,7 +167,9 @@ while(got_blocks < N_BLOCKS_TO_GET):
         time.sleep(0.3)
 
     new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
+    print("started thread ", got_blocks)
     new_block_thread.start()
+    print("ended thread", got_blocks)
     threads_to_stop.append(new_block_thread)
     # get_all_block_data(new_block, num_signatures, time_stamp)
     past_block_num = new_block
@@ -177,5 +180,5 @@ print("End of Data Collection")
 for i in threads_to_stop:
     i.join()
 
-process_all(VALIDATOR_NAME+'.csv')
+# process_all(VALIDATOR_NAME+'.csv')
 print("Done")

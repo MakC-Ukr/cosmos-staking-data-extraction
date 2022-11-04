@@ -21,6 +21,7 @@ def process_all(file_name):
     # file_name = "Twinstake.csv"
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name
     df = pd.read_csv(dir_path)
+    df = df.sort_values('block_num')
     new_df_ls = []
     prev_timestamp = time_to_unix(df.iloc[0]["timestamp"])
     last_block_num = df.iloc[0]["block_num"]
@@ -37,8 +38,7 @@ def process_all(file_name):
         last_block_num = row['block_num']
 
     new_df = pd.DataFrame(new_df_ls)
-    new_df = new_df.sort_values('block_num')
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name.split('.')[0]+'_processed.csv'
     new_df.to_csv(dir_path, index=False)
 
-process_all("Twinstake.csv")
+# process_all("Twinstake.csv")

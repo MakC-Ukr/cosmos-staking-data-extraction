@@ -13,7 +13,7 @@ from random import sample
 load_dotenv()
 MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
-RPC_URL_2 = os.getenv('RPC_URL_2')
+RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 headers = {'accept': 'application/json',}
@@ -77,7 +77,7 @@ def get_precommit_ratio(num_signatures):
 
 # returns a dictionary containing: community tax to be paid, miniumum proposer bonus, and maximum proposer bonus
 def get_chain_distribution_parameters():
-    response = requests.get(RPC_URL_2+'/distribution/parameters', headers=headers).json()['result']
+    response = requests.get(RPC_URL+'/distribution/parameters', headers=headers).json()['result']
     result_dict = {}
     result_dict['community_tax'] = response['community_tax']
     result_dict['min_proposer_bonus'] = response['base_proposer_reward']
@@ -86,11 +86,17 @@ def get_chain_distribution_parameters():
 
 # returns a dictionary of information: block number, denomination fo rewards, rewards accrued based on self-stake and based on delegation stakes
 def get_rewards(validator_addr):
-    response = requests.get(RPC_URL_2+'/distribution/validators/'+validator_addr, headers=headers).json()
+    # response = requests.get(RPC_URL+'/distribution/validators/'+validator_addr, headers=headers).json()
+    # result_dict = {}
+    # response = response['result']
+    # result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
+    # result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
+    # return result_dict
+    response = requests.get(RPC_URL+f'/cosmos/distribution/v1beta1/validators/{validator_addr}/commission', headers=headers).json()
     result_dict = {}
-    response = response['result']
-    result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
-    result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
+    response = response['commission']['commission'][0]['amount']
+    # result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
+    result_dict['commission_amt'] = response
     return result_dict
 
 def list_to_dict(ls, keys):
@@ -133,7 +139,7 @@ def get_total_fees(_block_num):
     return total_fees
 
 def get_validator_commission(validator_addr):
-    response = requests.get(RPC_URL_2+f'/cosmos/staking/v1beta1/validators/{validator_addr}', headers=headers).json()['validator']['commission']['commission_rates']['rate']
+    response = requests.get(RPC_URL+f'/cosmos/staking/v1beta1/validators/{validator_addr}', headers=headers).json()['validator']['commission']['commission_rates']['rate']
     response = float(response)*100
     return response
 
@@ -153,3 +159,16 @@ def get_ALL_validators_info(ls_valid):
                 index+=1
                 break
     return res_dict
+
+# x= 0
+# last_reward = 0
+# curr_reward = 0
+
+# while(x < 50):
+#     while(curr_reward == last_reward):
+#         curr_reward = get_rewards('cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69')['commission_amt']
+#         time.sleep(0.4)
+#     diff = float(curr_reward) - float(last_reward)
+#     print(diff)
+#     last_reward = curr_reward
+#     x += 1

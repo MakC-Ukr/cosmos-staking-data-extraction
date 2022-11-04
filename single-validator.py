@@ -11,7 +11,7 @@ from single_validators.process_all import process_all
 
 # Loading prerequisites
 load_dotenv()
-N_BLOCKS_TO_GET = 100
+N_BLOCKS_TO_GET = 300
 VALIDATOR_NAME = "Twinstake"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
@@ -64,8 +64,6 @@ def MyThread3(res, key, _latest_block):
     print(time.time()-t, "s for thread 3")
 
 # 4 - block timestamp
-# def MyThread4(res, key, _latest_block):
-#     res[key] = get_timestamp(_latest_block)
 def MyThread4(res, key, _timestamp):
     # t = time.time()
     res[key] = _timestamp
@@ -139,10 +137,13 @@ def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp):
 
     for thread in all_threads:
         thread.start()
-
     for thread in all_threads:
         thread.join()
 
+    dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
+    print(bcolors.OKGREEN, "result for block ", LATEST_BLOCK," : ", bcolors.ENDC, result)
+    df = pd.read_csv(dir_path)
+    df_ls = df.to_dict('records')
     df_ls.append(result)
     pd.DataFrame(df_ls).to_csv(dir_path, index=False)
 
@@ -162,12 +163,12 @@ while(got_blocks < N_BLOCKS_TO_GET):
         print(new_block)
         num_signatures=len(resp['block']['last_commit']['signatures'])
         time_stamp = resp['block']['header']['time']
-        time.sleep(1)
+        time.sleep(0.3)
 
-    # new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
-    # new_block_thread.start()
-    # threads_to_stop.append(new_block_thread)
-    get_all_block_data(new_block, num_signatures, time_stamp)
+    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
+    new_block_thread.start()
+    threads_to_stop.append(new_block_thread)
+    # get_all_block_data(new_block, num_signatures, time_stamp)
     past_block_num = new_block
     got_blocks+=1
 

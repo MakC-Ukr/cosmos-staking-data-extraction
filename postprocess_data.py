@@ -40,3 +40,5 @@ def post_process_data():
 
     new_df = pd.DataFrame(new_df_ls)
     new_df.to_csv(dir_path_output, index=False)
+
+print(time_to_unix('2022-11-03T09:16:52.463755856Z'))

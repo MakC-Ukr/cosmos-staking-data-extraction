@@ -2,7 +2,14 @@ import pandas as pd
 import datetime
 import os
 
-DEFAULT_BLOCK_TIME = 6.12345
+DEFAULT_BLOCK_TIME = 6.1143
+file_name = "Twinstake.csv"
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name
+df = pd.read_csv(dir_path)
+df.sort_values(by=['block_num'], inplace=True)
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/Twinstake_sorted.csv'
+df.to_csv(dir_path, index=False)
+
 
 def time_to_unix(time):
     year = int(time.split('-')[0])
@@ -21,7 +28,8 @@ def process_all(file_name):
     # file_name = "Twinstake.csv"
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name
     df = pd.read_csv(dir_path)
-    df = df.sort_values('block_num')
+    df.sort_values('block_num', inplace=True)
+    print(df.iloc[65:70])
     new_df_ls = []
     prev_timestamp = time_to_unix(df.iloc[0]["timestamp"])
     last_block_num = df.iloc[0]["block_num"]
@@ -36,9 +44,32 @@ def process_all(file_name):
         new_df_ls.append(row)
         prev_timestamp = time_to_unix(row['timestamp'])
         last_block_num = row['block_num']
+    
+        new_row = pd.Series(row).copy(deep=True)
+        if ind >= len(df)-1:
+            continue
+        diff_from_next_row = df.iloc[ind+1]['block_num'] - row['block_num']-1
+        rew_diff = df.iloc[ind+1]['commission_amt'] - row['commission_amt']
+        row_block_num = row['block_num']
+        row_reward = row['commission_amt']
+        for i in range(diff_from_next_row):
+            new_row = pd.Series(new_row).copy(deep=True)
+            # print(i)
+            # print("row_block_num:",row_block_num)
+            # print("diff_from_next_row:",diff_from_next_row)
+            # print("df.iloc[ind+1]:", df.iloc[ind+1]['block_num'])
+            new_row['block_num'] = row_block_num + i + 1
+            # print("new_row['block_num']:", new_row['block_num'])
+            # new_row['commission_amt'] = row_reward + rew_diff/(diff_from_next_row+1)*(i+1)
+            # print("new_row['commission_amt']:", new_row['commission_amt'])
+            i+=1
+            new_df_ls.append(new_row)
+            # print(new_row[:2])
+        
+
 
     new_df = pd.DataFrame(new_df_ls)
-    dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name.split('.')[0]+'_processed.csv'
+    dir_path = os.path.dirname(os.path.realpath(__file__))+'/Twinstake_processed.csv'
     new_df.to_csv(dir_path, index=False)
 
-# process_all("Twinstake.csv")
+process_all("Twinstake_sorted.csv")

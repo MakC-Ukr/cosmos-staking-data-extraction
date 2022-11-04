@@ -1,15 +1,8 @@
 import pandas as pd
 import datetime
 import os
-
 DEFAULT_BLOCK_TIME = 6.1143
 file_name = "Twinstake.csv"
-dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name
-df = pd.read_csv(dir_path)
-df.sort_values(by=['block_num'], inplace=True)
-dir_path = os.path.dirname(os.path.realpath(__file__))+'/Twinstake_sorted.csv'
-df.to_csv(dir_path, index=False)
-
 
 def time_to_unix(time):
     year = int(time.split('-')[0])
@@ -72,4 +65,10 @@ def process_all(file_name):
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/Twinstake_processed.csv'
     new_df.to_csv(dir_path, index=False)
 
+
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name
+df = pd.read_csv(dir_path)
+df.sort_values(by=['block_num'], inplace=True)
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/Twinstake_sorted.csv'
+df.to_csv(dir_path, index=False)
 process_all("Twinstake_sorted.csv")

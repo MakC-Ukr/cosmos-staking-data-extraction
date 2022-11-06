@@ -15,7 +15,6 @@ MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
 RPC_URL = os.getenv('RPC_URL')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
-VALIDATOR_ADDRESS= os.getenv('VALIDATOR_ADDRESS')
 headers = {'accept': 'application/json',}
 CMC_headers = {
     'X-CMC_PRO_API_KEY': '98c35ce7-275c-46d3-9221-1c08ae3caf3f',
@@ -97,6 +96,7 @@ def get_rewards(validator_addr):
     response = response['commission']['commission'][0]['amount']
     # result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
     result_dict['commission_amt'] = response
+    print(result_dict)
     return result_dict
 
 def list_to_dict(ls, keys):
@@ -160,15 +160,3 @@ def get_ALL_validators_info(ls_valid):
                 break
     return res_dict
 
-# x= 0
-# last_reward = 0
-# curr_reward = 0
-
-# while(x < 50):
-#     while(curr_reward == last_reward):
-#         curr_reward = get_rewards('cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69')['commission_amt']
-#         time.sleep(0.4)
-#     diff = float(curr_reward) - float(last_reward)
-#     print(diff)
-#     last_reward = curr_reward
-#     x += 1

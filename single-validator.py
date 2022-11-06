@@ -1,26 +1,26 @@
 import time
 import threading
 import pandas as pd
-from threading import Thread
 import os
-from time import sleep
+from threading import Thread
 from dotenv import load_dotenv
+from time import sleep
 import requests
 from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
-from single_validators.process_all import process_all
 
 # Loading prerequisites
 load_dotenv()
-N_BLOCKS_TO_GET = 300
-VALIDATOR_NAME = "Twinstake"
+N_BLOCKS_TO_GET = 200
+VALIDATOR_NAME = "Figment"
+VALIDATOR_ADDRESS= "cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
 df_ls = df.to_dict('records')
 COLUMN_NAMES = list(df.columns)
 RPC_URL = os.getenv('RPC_URL')
 RPC_URL_2 = os.getenv('RPC_URL_2')
-VALIDATOR_ADDRESS= "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69"
 N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])
+CHAIN_DISTRIBUTION_PARAMS = get_chain_distribution_parameters()
 print("Loaded libraries...")
 
 # CONST VALUES - 9,10,11,12,13,17,21
@@ -39,11 +39,11 @@ CONST_ATTRIBUTES = {
 
 # No API calls to get data
 def MyThread0(res, _latest_block):
-    # t = time.time()
+    t = time.time()
     res['block_num'] = _latest_block
     for key in CONST_ATTRIBUTES.keys():
         res[key] = CONST_ATTRIBUTES[key]
-    # print(time.time()-t, "s for thread 0")
+    print(time.time()-t, "s for thread 0")
 
 # 1 - INFLATION RATE
 def MyThread1(res, key):
@@ -63,17 +63,17 @@ def MyThread3(res, key, _latest_block):
     res[key] = get_total_fees(_latest_block)
     print(time.time()-t, "s for thread 3")
 
-# 4 - block timestamp
-def MyThread4(res, key, _timestamp):
-    # t = time.time()
-    res[key] = _timestamp
-    # print(time.time()-t, "s for thread 4")
+# 4 - block timestamp and proposer address
+def MyThread4(res, key, _data):
+    t = time.time()
+    res[key] = _data
+    print(time.time()-t, "s for thread 4")
 
 # 5 - PRECOMMITS RATIO
 def MyThread5(res, key, num_signatures):
-    # t = time.time()
+    t = time.time()
     res[key] = int(num_signatures)/N_ACTIVE_VALIDATORS
-    # print(time.time()-t, "s for thread 5")
+    print(time.time()-t, "s for thread 5")
 
 # 6 - ATOM STAKED BY VALIDATOR
 def MyThread6(res, key):
@@ -97,9 +97,8 @@ def MyThread8(res, key):
 # 14, 15, 16 - min proposer bonus, max proposer bonus, community tax
 def MyThread9(res):
     t = time.time()
-    result_dict = get_chain_distribution_parameters()
-    for key in result_dict.keys():
-        res[key] = result_dict[key]
+    for key in CHAIN_DISTRIBUTION_PARAMS.keys():
+        res[key] = CHAIN_DISTRIBUTION_PARAMS[key]
     print(time.time()-t, "s for thread 9")
 
 # 18 - Rewards
@@ -113,10 +112,12 @@ def MyThread10(res, validator_addr):
 # 22 - validator commission
 def MyThread11(res, key, validator_addr):
     t = time.time()
-    res[key] = get_validator_commission(validator_addr)
+    if 'commission' not in CONST_ATTRIBUTES.keys():
+        CONST_ATTRIBUTES['commission'] = get_validator_commission(validator_addr)
+    res[key] = CONST_ATTRIBUTES['commission']
     print(time.time()-t, "s for thread 11")
 
-def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp):
+def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp, _proposer_addr):
     t = time.time()
     print(bcolors.OKCYAN, "BLOCK ", LATEST_BLOCK, bcolors.ENDC)
     result = {}
@@ -125,6 +126,7 @@ def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp):
         threading.Thread(target=MyThread1, args=[result, "inflation_rate"]),
         threading.Thread(target=MyThread2, args=[result, "percent_staked"]),
         threading.Thread(target=MyThread3, args=[result, "total_block_fees", LATEST_BLOCK]),
+        threading.Thread(target=MyThread4, args=[result, "proposer", _proposer_addr]),
         threading.Thread(target=MyThread4, args=[result, "timestamp", _timestamp]),
         threading.Thread(target=MyThread5, args=[result, "sign_ratio", num_signatures]),
         threading.Thread(target=MyThread6, args=[result, "atom_staked_v"]),
@@ -164,9 +166,10 @@ while(got_blocks < N_BLOCKS_TO_GET):
         print(new_block)
         num_signatures=len(resp['block']['last_commit']['signatures'])
         time_stamp = resp['block']['header']['time']
+        proposer_addr = resp['block']['header']['proposer_address']
         time.sleep(0.3)
 
-    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp])
+    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp, proposer_addr])
     print("started thread ", got_blocks)
     new_block_thread.start()
     print("ended thread", got_blocks)
@@ -180,5 +183,4 @@ print("End of Data Collection")
 for i in threads_to_stop:
     i.join()
 
-# process_all(VALIDATOR_NAME+'.csv')
 print("Done")

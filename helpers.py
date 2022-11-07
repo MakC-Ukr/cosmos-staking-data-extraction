@@ -1,6 +1,7 @@
 import pandas as pd
 import time
 import requests
+import numpy as np
 import time
 import json
 import os
@@ -113,19 +114,19 @@ def get_block_time(bl_num):
     response = requests.get(RPC_URL+'/blocks/'+str(bl_num), headers=headers).json()['block']['header']['time']
     return response
 
-def get_fees_collected(block_number):    
-    params = {
-        'limit': '30',
-    }
-    response = requests.get('https://api.cosmostation.io/v1/txs', params=params, headers=headers).json()
-    total_fees = 0
+# def get_fees_collected(block_number):    
+#     params = {
+#         'limit': '30',
+#     }
+#     response = requests.get('https://api.cosmostation.io/v1/txs', params=params, headers=headers).json()
+#     total_fees = 0
 
-    for tx in response:
-        act_block_height = tx['data']['height']
-        act_fee = float(tx['data']['tx']['auth_info']['fee']['amount'][0]['amount'])
-        if act_block_height == str(block_number):
-            total_fees+=act_fee
-    return total_fees
+#     for tx in response:
+#         act_block_height = tx['data']['height']
+#         act_fee = float(tx['data']['tx']['auth_info']['fee']['amount'][0]['amount'])
+#         if act_block_height == str(block_number):
+#             total_fees+=act_fee
+#     return total_fees
 
 def get_total_fees(_block_num):
     params = {
@@ -160,3 +161,14 @@ def get_ALL_validators_info(ls_valid):
                 break
     return res_dict
 
+# returns the sum of active validators' stake and inactive validators' stake (in ATOM)
+def get_active_stake_vs_inactive():
+    all_info = requests.get(COSMOSCAN_API+'/validators', headers=headers).json()
+    stakes = []
+    for i in range(len(all_info)):
+        stakes.append(float(all_info[i]['power']))
+    stakes = np.array(stakes)
+    stakes.sort()
+    active_sum = stakes[-175:].sum()
+    inactive_sum = stakes[:-175].sum()
+    return active_sum, inactive_sum

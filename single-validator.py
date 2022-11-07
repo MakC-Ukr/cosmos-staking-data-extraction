@@ -6,13 +6,13 @@ from threading import Thread
 from dotenv import load_dotenv
 from time import sleep
 import requests
-from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from helpers import bcolors, get_sign_ratio_from_signatures_array, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 
 # Loading prerequisites
 load_dotenv()
 N_BLOCKS_TO_GET = 200
-VALIDATOR_NAME = "Figment"
-VALIDATOR_ADDRESS= "cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d"
+VALIDATOR_NAME = "Twinstake"
+VALIDATOR_ADDRESS= "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
 df_ls = df.to_dict('records')
@@ -70,9 +70,9 @@ def MyThread4(res, key, _data):
     print(time.time()-t, "s for thread 4")
 
 # 5 - PRECOMMITS RATIO
-def MyThread5(res, key, num_signatures):
+def MyThread5(res, key, _block_signatures):
     t = time.time()
-    res[key] = int(num_signatures)/N_ACTIVE_VALIDATORS
+    res[key] = get_sign_ratio_from_signatures_array(_block_signatures, N_ACTIVE_VALIDATORS)
     print(time.time()-t, "s for thread 5")
 
 # 6 - ATOM STAKED BY VALIDATOR
@@ -117,7 +117,7 @@ def MyThread11(res, key, validator_addr):
     res[key] = CONST_ATTRIBUTES['commission']
     print(time.time()-t, "s for thread 11")
 
-def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp, _proposer_addr):
+def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_addr):
     t = time.time()
     print(bcolors.OKCYAN, "BLOCK ", LATEST_BLOCK, bcolors.ENDC)
     result = {}
@@ -128,7 +128,7 @@ def get_all_block_data(LATEST_BLOCK, num_signatures, _timestamp, _proposer_addr)
         threading.Thread(target=MyThread3, args=[result, "total_block_fees", LATEST_BLOCK]),
         threading.Thread(target=MyThread4, args=[result, "proposer", _proposer_addr]),
         threading.Thread(target=MyThread4, args=[result, "timestamp", _timestamp]),
-        threading.Thread(target=MyThread5, args=[result, "sign_ratio", num_signatures]),
+        threading.Thread(target=MyThread5, args=[result, "sign_ratio", _block_signatures]),
         threading.Thread(target=MyThread6, args=[result, "atom_staked_v"]),
         threading.Thread(target=MyThread7, args=[result, "total_supply"]),
         threading.Thread(target=MyThread8, args=[result, "n_validators"]),
@@ -164,17 +164,17 @@ while(got_blocks < N_BLOCKS_TO_GET):
         resp = requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json() # gets latest block number
         new_block = int(resp['block']['header']['height'])
         print(new_block)
-        num_signatures=len(resp['block']['last_commit']['signatures'])
+        block_signatures=resp['block']['last_commit']['signatures']
         time_stamp = resp['block']['header']['time']
         proposer_addr = resp['block']['header']['proposer_address']
         time.sleep(0.3)
 
-    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, num_signatures, time_stamp, proposer_addr])
+    new_block_thread = threading.Thread(target=get_all_block_data, args = [new_block, block_signatures, time_stamp, proposer_addr])
     print("started thread ", got_blocks)
     new_block_thread.start()
     print("ended thread", got_blocks)
     threads_to_stop.append(new_block_thread)
-    # get_all_block_data(new_block, num_signatures, time_stamp)
+    # get_all_block_data(new_block, block_signatures, time_stamp)
     past_block_num = new_block
     got_blocks+=1
 

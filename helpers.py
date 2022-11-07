@@ -172,3 +172,10 @@ def get_active_stake_vs_inactive():
     active_sum = stakes[-175:].sum()
     inactive_sum = stakes[:-175].sum()
     return active_sum, inactive_sum
+
+def get_sign_ratio_from_signatures_array(block_signatures, n_act_validators):
+    count=0
+    for i in block_signatures:
+        if i['block_id_flag'] == 'BLOCK_ID_FLAG_COMMIT':
+            count+=1
+    return count/n_act_validators

@@ -8,7 +8,7 @@ import base64
 import pandas as pd
 import time
 
-START_BLOCK = 12763313
+START_BLOCK = 12763578
 END_BLOCK = 12763590
 
 headers = {'accept': 'application/json'}
@@ -67,7 +67,7 @@ for i in tqdm(range(START_BLOCK, END_BLOCK+1)):
     row = {}
     row['block_number'] = i
     for ind_addr, addr in enumerate(all_addresses):
-        row['val_'+str(ind_addr)] = val_rewards[addr]
+        row['val_'+str(ind_addr)] = val_rewards[addr][:-4] # remove the last 4 characters which are the denom
     df_ls.append(row)
     pd.DataFrame(df_ls).to_csv(dir_path, index= False)
     time.sleep(3)

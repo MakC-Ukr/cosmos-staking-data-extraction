@@ -36,4 +36,4 @@ for i in tqdm(range(START_BLOCK, END_BLOCK+1)):
     row["block_fees"] = get_total_fees(i)
     df_ls.append(row)
     pd.DataFrame(df_ls).to_csv(dir_path, index=False)
-    time.sleep(3)
+    time.sleep(5)

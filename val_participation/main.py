@@ -12,29 +12,33 @@ class bcolors:
     WARNING = '\033[93m'
     ENDC = '\033[0m'
 
+# load the dictionary that contains the bech32-> hex mapping and reverse it i.e. to contain hex-> bech32 data
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/bech32_to_hex.json'
 bech32_to_hex = json.load(fp=open(dir_path))
 hex_to_bech32 = {v:k for k,v in bech32_to_hex.items()}
 
+# load activated stakes for each validator
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/active_vals.json'
 all_stakes = json.load(fp=open(dir_path))
 operator_to_stake = {}
 for i in all_stakes:
     operator_to_stake[i['operator_address']] = i['tokens']
 
+# get the list of operator addresses for 175 active validators
 columns = ['block_number']
 df_ls = []
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/active_vals.json'
 all_addresses = [val['operator_address'] for val in json.load(open(dir_path))]
+assert len(all_addresses) == 175
 
+# iterate through all the blocks 
 for block in range(START_BLOCK, END_BLOCK+1):
     all_validator_keys = {}
     row = {}
     row['block_num'] = block
 
-    # get participations for this block in all_validator_keys
+    # get participations for this block in all_validator_keys dicitonary (1 for participation and 0 for absence)
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/block_signatures/'+str(block)+'.json'
-    
     with open(dir_path) as f:
         data = json.load(f)
         for signature in data:
@@ -49,10 +53,11 @@ for block in range(START_BLOCK, END_BLOCK+1):
                     all_validator_keys[op_addr] = 0
             except:
                 print("No corresponding bech32 for ", signature)
-
-        json.dump(all_validator_keys, open("all_validator_keys.json", "w+"))
+                # if this happens, it means that we need to get the latest active validators list and 
+                # update the hex addresses (either run the SmartStake script or get it from SmartStake manually for 
+                # the difference set between past and current validator set)
+        # json.dump(all_validator_keys, open("all_validator_keys.json", "w"))
     # iterate over validators and fill two columns for stake and vote
-
     errors = 0
     for ind, operator_address in enumerate(all_addresses):
         try:
@@ -62,8 +67,7 @@ for block in range(START_BLOCK, END_BLOCK+1):
             errors+=1
             row['stake_'+str(ind)] = operator_to_stake[operator_address]
             row['vote_'+str(ind)] = 0
-            print(operator_address)
-    print(bcolors.WARNING, 'Total errors in block: ', block, " : ", errors, bcolors.ENDC)
+    row['missed_blocks'] = errors
     df_ls.append(row)
 
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/participation.csv'

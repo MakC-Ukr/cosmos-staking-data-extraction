@@ -39,5 +39,7 @@ def get_rewards(val_address, BLOCK):
 # response = requests.get(url=url, headers=headers).json()
 # json.dump(response, open('begin_block_events.json', 'w+'))
 
-st = '''2fikG3gqpqZq3IH5U5I8fc57YAE='''
-print(base64.b64decode(st))
+# st = '''2fikG3gqpqZq3IH5U5I8fc57YAE='''
+# print(base64.b64decode(st))
+
+print(get_rewards('cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', ''))

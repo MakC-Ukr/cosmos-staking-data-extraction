@@ -14,7 +14,7 @@ from random import sample
 load_dotenv()
 MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
-RPC_URL = os.getenv('RPC_URL')
+RPC_URL_3 = os.getenv('RPC_URL_3')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 headers = {'accept': 'application/json',}
 CMC_headers = {
@@ -63,7 +63,7 @@ def get_n_validators():
     return len(response)
     
 def get_n_active_validators():
-    validator_set = requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total']
+    validator_set = requests.get(RPC_URL_3+'/validatorsets/latest', headers=headers).json()['result']['total']
     return int(validator_set)
 
 def get_validator_stake(validator_addr):    
@@ -179,3 +179,8 @@ def get_sign_ratio_from_signatures_array(block_signatures, n_act_validators):
         if i['block_id_flag'] == 'BLOCK_ID_FLAG_COMMIT':
             count+=1
     return count/n_act_validators
+
+def get_signatures(_block_num):
+    url = RPC_URL+f'/blocks/{_block_num}'
+    block_info = requests.get(url, headers=headers).json()['block']['last_commit']['signatures']
+    return block_info

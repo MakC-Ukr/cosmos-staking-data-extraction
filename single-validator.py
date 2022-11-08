@@ -1,16 +1,17 @@
 import time
 import threading
-import pandas as pd
+import json
 import os
+import pandas as pd
 from threading import Thread
 from dotenv import load_dotenv
 from time import sleep
 import requests
-from helpers import bcolors, get_sign_ratio_from_signatures_array, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from helpers import bcolors, get_signatures, get_sign_ratio_from_signatures_array, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 
 # Loading prerequisites
 load_dotenv()
-N_BLOCKS_TO_GET = 200
+N_BLOCKS_TO_GET = 400
 VALIDATOR_NAME = "Twinstake"
 VALIDATOR_ADDRESS= "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
@@ -19,6 +20,7 @@ df_ls = df.to_dict('records')
 COLUMN_NAMES = list(df.columns)
 RPC_URL = os.getenv('RPC_URL')
 RPC_URL_2 = os.getenv('RPC_URL_2')
+RPC_URL_3 = os.getenv('RPC_URL_3')
 N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])
 CHAIN_DISTRIBUTION_PARAMS = get_chain_distribution_parameters()
 print("Loaded libraries...")
@@ -60,7 +62,8 @@ def MyThread2(res, key):
 # 2, 20 - Total_Fees_Per_Block and txFees
 def MyThread3(res, key, _latest_block):
     t = time.time()
-    res[key] = get_total_fees(_latest_block)
+    # res[key] = get_total_fees(_latest_block)
+    res[key] = 0
     print(time.time()-t, "s for thread 3")
 
 # 4 - block timestamp and proposer address
@@ -117,6 +120,13 @@ def MyThread11(res, key, validator_addr):
     res[key] = CONST_ATTRIBUTES['commission']
     print(time.time()-t, "s for thread 11")
 
+# thread to save the signatures of the block in a separate folder
+def MyThread12(_block_num):
+    t = time.time()
+    resp = get_signatures(_block_num)
+    json.dump(resp, open(f'./val_participation/block_signatures/{_block_num}.json', 'w'))
+    print(time.time()-t, "s for thread 12")
+
 def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_addr):
     t = time.time()
     print(bcolors.OKCYAN, "BLOCK ", LATEST_BLOCK, bcolors.ENDC)
@@ -134,7 +144,8 @@ def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_ad
         threading.Thread(target=MyThread8, args=[result, "n_validators"]),
         threading.Thread(target=MyThread9, args=[result]),
         threading.Thread(target=MyThread10, args=[result, VALIDATOR_ADDRESS]),
-        threading.Thread(target=MyThread11, args=[result, "v_commission", VALIDATOR_ADDRESS])
+        threading.Thread(target=MyThread11, args=[result, "v_commission", VALIDATOR_ADDRESS]),
+        threading.Thread(target=MyThread12, args=[LATEST_BLOCK])
     ]
 
     for thread in all_threads:

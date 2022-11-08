@@ -1,4 +1,5 @@
 import requests
+import json
 import os
 import base64
 from dotenv import load_dotenv
@@ -14,7 +15,7 @@ def get_rewards(val_address, BLOCK):
     response = requests.get(url=url, headers=headers)
     begin_block_events = response.json()['result']['begin_block_events']
     for event in begin_block_events:
-        if event['type'] == "rewards": # or event['type'] == "commission"
+        if event['type'] == "rewards"  or event['type'] == "commission":
             if len(event['attributes']) != 2:
                 # Probably skipping event with wrong shape
                 pass
@@ -27,10 +28,16 @@ def get_rewards(val_address, BLOCK):
                     key1 = base64.b64decode(a1['key']).decode("utf-8")
                     value1 = base64.b64decode(a1['value']).decode("utf-8")
                     if key0 == "amount" and key1 == "validator" and value1 == val_address:
-                        print(f"{value0} paid to our validator")
+                        print(f"{value0} {event['type']} paid to our validator")
                 except TypeError:
                     # Probably "argument should be a bytes-like object or ASCII string, not 'NoneType'"
                     # Probably missing key or value
                     pass
 
-get_rewards('cosmosvaloper1gdg6qqe5a3u483unqlqsnullja23g0xvqkxtk0', 12756418)
+# get_rewards('cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', 12756998)
+# url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height=12756999'
+# response = requests.get(url=url, headers=headers).json()
+# json.dump(response, open('begin_block_events.json', 'w+'))
+
+st = '''2fikG3gqpqZq3IH5U5I8fc57YAE='''
+print(base64.b64decode(st))

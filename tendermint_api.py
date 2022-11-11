@@ -13,7 +13,7 @@ VALIDATOR = 'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69'
 ALLTHATNODE_API_KEY = os.getenv('ALLTHATNODE_API_KEY')
 
 def get_rewards(val_address, BLOCK):
-    url = f'https://cosmos-mainnet-rpc.allthatnode.com:26657/{ALLTHATNODE_API_KEY}/block_results?height={BLOCK}'
+    url = f'https://rpc.cosmos.network/block_results?height={BLOCK}'
     response = requests.get(url=url, headers=headers)
     begin_block_events = response.json()['result']['begin_block_events']
     for event in begin_block_events:

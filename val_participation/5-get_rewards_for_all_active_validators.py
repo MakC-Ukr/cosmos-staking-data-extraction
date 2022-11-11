@@ -53,7 +53,6 @@ def get_rewards(BLOCK):
                     pass
     return val_rewards
 
-
 df_ls = []
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/active_val_rewards.csv'
 df = pd.read_csv(dir_path)

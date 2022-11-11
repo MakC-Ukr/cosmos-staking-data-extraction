@@ -27,7 +27,8 @@ assert len(all_addresses) == 175
 
 def get_rewards(BLOCK):
     val_rewards = {}
-    url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height={BLOCK}'
+    # url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height={BLOCK}'  # Can use this RPC if the next line fails
+    url = f'https://rpc.cosmos.network/block_results?height={BLOCK}'
     response = requests.get(url=url, headers=headers)
     begin_block_events = response.json()['result']['begin_block_events']
     for event in begin_block_events:

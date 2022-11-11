@@ -173,6 +173,9 @@ def get_active_stake_vs_inactive():
     inactive_sum = stakes[:-175].sum()
     return active_sum, inactive_sum
 
+# @desc returns the signing ratio for a block
+# @param block_signatures - an array of signatures for a block
+# @param n_act_validators - number of active validators on the network
 def get_sign_ratio_from_signatures_array(block_signatures, n_act_validators):
     count=0
     for i in block_signatures:
@@ -180,7 +183,11 @@ def get_sign_ratio_from_signatures_array(block_signatures, n_act_validators):
             count+=1
     return count/n_act_validators
 
+# @desc returns the array of signatures from each active validator for a specific block number
+# @param _block_num - the height of the block for which the signatures are to be returned
 def get_signatures(_block_num):
     url = RPC_URL+f'/blocks/{_block_num}'
     block_info = requests.get(url, headers=headers).json()['block']['last_commit']['signatures']
     return block_info
+
+print(get_block_time(12763524))

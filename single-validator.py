@@ -155,7 +155,10 @@ def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_ad
 
     dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
     print(bcolors.OKGREEN, "result for block ", LATEST_BLOCK," : ", bcolors.ENDC, result)
-    df = pd.read_csv(dir_path)
+    try:
+        df = pd.read_csv(dir_path)
+    except:
+        df = pd.DataFrame()
     df_ls = df.to_dict('records')
     df_ls.append(result)
     pd.DataFrame(df_ls).to_csv(dir_path, index=False)

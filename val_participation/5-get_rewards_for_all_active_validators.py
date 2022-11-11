@@ -8,8 +8,8 @@ import base64
 import pandas as pd
 import time
 
-START_BLOCK = 12763578
-END_BLOCK = 12763590
+START_BLOCK = 12788514
+END_BLOCK = 12788614
 
 headers = {'accept': 'application/json'}
 

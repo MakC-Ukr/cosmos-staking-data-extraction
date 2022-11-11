@@ -11,9 +11,9 @@ from helpers import bcolors, get_signatures, get_sign_ratio_from_signatures_arra
 
 # Loading prerequisites
 load_dotenv()
-N_BLOCKS_TO_GET = 400
-VALIDATOR_NAME = "Twinstake"
-VALIDATOR_ADDRESS= "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69"
+N_BLOCKS_TO_GET = 300
+VALIDATOR_NAME = "Coinbase"
+VALIDATOR_ADDRESS= "cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en"
 dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
 df = pd.read_csv(dir_path)
 df_ls = df.to_dict('records')

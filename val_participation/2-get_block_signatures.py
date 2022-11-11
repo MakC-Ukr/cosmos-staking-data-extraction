@@ -1,7 +1,7 @@
 # This file is used to get the block signatures for a given range of block number. 
 # Even though the `../single_validators.py` file is supposed to automatically save block signatures to `block_signatures/` folder, 
 # this might be used JIC.
-
+from tqdm import tqdm
 import requests
 import json
 import os
@@ -18,11 +18,10 @@ def get_signatures(_block_num):
     block_info = requests.get(url, headers=headers).json()['block']['last_commit']['signatures']
     return block_info
 
-START_BLOCK = 12763286
-END_BLOCK = 12763590
+START_BLOCK = 12788313
+END_BLOCK = 12788614
 
-for i in range(START_BLOCK, END_BLOCK+1):
-    print(i)
+for i in tqdm(range(START_BLOCK, END_BLOCK+1)):
     dir_path = os.path.dirname(os.path.realpath(__file__))+'/block_signatures/'+str(i)+'.json'
     signatures = get_signatures(i)
     json.dump(signatures, open(dir_path, 'w+'))

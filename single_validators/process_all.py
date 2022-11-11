@@ -2,7 +2,7 @@ import pandas as pd
 import datetime
 import os
 DEFAULT_BLOCK_TIME = 6.1143
-file_name = "Twinstake.csv"
+file_name = "Coinbase.csv"
 ValidatorName = file_name.split('.')[0]
 
 def time_to_unix(time):

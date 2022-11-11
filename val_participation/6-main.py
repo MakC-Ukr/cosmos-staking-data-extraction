@@ -4,8 +4,8 @@ import json
 import os
 import pandas as pd
 
-START_BLOCK = 12763286
-END_BLOCK = 12763590
+START_BLOCK = 12788313
+END_BLOCK = 12788614
 
 class bcolors:
     OKCYAN = '\033[96m'

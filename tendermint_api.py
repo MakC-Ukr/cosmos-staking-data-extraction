@@ -1,4 +1,6 @@
+import pandas as pd
 import requests
+import numpy as np
 import json
 import os
 import base64
@@ -34,12 +36,9 @@ def get_rewards(val_address, BLOCK):
                     # Probably missing key or value
                     pass
 
-# get_rewards('cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', 12756998)
-# url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height=12756999'
+# url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height=12763524'
 # response = requests.get(url=url, headers=headers).json()
 # json.dump(response, open('begin_block_events.json', 'w+'))
-
-# st = '''2fikG3gqpqZq3IH5U5I8fc57YAE='''
-# print(base64.b64decode(st))
-
-print(get_rewards('cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', ''))
+dir = json.load(fp=open('begin_block_events.json', 'r'))
+x = [i['type'] for i in dir['result']['begin_block_events']]
+print(pd.Series(x).unique())

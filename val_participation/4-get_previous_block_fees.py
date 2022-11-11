@@ -5,9 +5,8 @@ import json
 import requests
 import time
 
-START_BLOCK = 12763287
-END_BLOCK = 12763590
-
+START_BLOCK = 12788591
+END_BLOCK = 12788614
 
 headers = {'accept': 'application/json'}
 def get_total_fees(_block_num):

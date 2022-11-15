@@ -1,4 +1,5 @@
 import pandas as pd
+import base64
 import time
 import requests
 import numpy as np
@@ -190,4 +191,36 @@ def get_signatures(_block_num):
     block_info = requests.get(url, headers=headers).json()['block']['last_commit']['signatures']
     return block_info
 
-print(get_block_time(12763524))
+def get_rewards(BLOCK):
+    def def_value():
+        return 0
+    val_rewards = defaultdict(def_value)
+
+    # url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height={BLOCK}'  # Can use this RPC if the next line fails
+    url = f'https://rpc.cosmos.network/block_results?height={BLOCK}'
+    response = requests.get(url=url, headers=headers)
+    begin_block_events = response.json()['result']['begin_block_events']
+    print(set([i['type'] for i in begin_block_events]))
+    for event in begin_block_events:
+        if event['type'] == "rewards": # "proposer_reward" type event intentionally not mentioned because it is duplicated as "reward" as well
+            if len(event['attributes']) != 2:
+                print(bcolors.WARNING, "skipping block with diff shape. Type: ", event['type'], bcolors.ENDC)
+                # Probably skipping event with wrong shape
+                pass
+            else:
+                a0 = event['attributes'][0]
+                a1 = event['attributes'][1]
+                try:
+                    key0 = base64.b64decode(a0['key']).decode("utf-8")
+                    value0 = base64.b64decode(a0['value']).decode("utf-8")
+                    key1 = base64.b64decode(a1['key']).decode("utf-8")
+                    value1 = base64.b64decode(a1['value']).decode("utf-8")
+                    if key0 == "amount" and key1 == "validator" and event['type'] == 'rewards':
+                        val_rewards[value1] += float(value0[:-5])
+                except TypeError:
+                    # print(bcolors.WARNING, "Error 1: check file code", bcolors.ENDC)
+                    # Probably "argument should be a bytes-like object or ASCII string, not 'NoneType'"
+                    # Probably missing key or value
+                    pass
+    
+    return val_rewards

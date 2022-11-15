@@ -13,11 +13,12 @@ VALIDATOR = 'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69'
 ALLTHATNODE_API_KEY = os.getenv('ALLTHATNODE_API_KEY')
 
 def get_rewards(val_address, BLOCK):
+    # url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height={BLOCK}'
     url = f'https://rpc.cosmos.network/block_results?height={BLOCK}'
     response = requests.get(url=url, headers=headers)
     begin_block_events = response.json()['result']['begin_block_events']
     for event in begin_block_events:
-        if event['type'] == "rewards"  or event['type'] == "commission":
+        if event['type'] == "rewards"  or event['type'] == "commission": # "proposer_reward" type event intentionally not mentioned because it is duplicated as "reward" as well
             if len(event['attributes']) != 2:
                 # Probably skipping event with wrong shape
                 pass
@@ -35,10 +36,3 @@ def get_rewards(val_address, BLOCK):
                     # Probably "argument should be a bytes-like object or ASCII string, not 'NoneType'"
                     # Probably missing key or value
                     pass
-
-# url = f'https://rpc-cosmoshub.blockapsis.com/block_results?height=12763524'
-# response = requests.get(url=url, headers=headers).json()
-# json.dump(response, open('begin_block_events.json', 'w+'))
-dir = json.load(fp=open('begin_block_events.json', 'r'))
-x = [i['type'] for i in dir['result']['begin_block_events']]
-print(pd.Series(x).unique())

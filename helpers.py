@@ -19,7 +19,7 @@ RPC_URL_3 = os.getenv('RPC_URL_3')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 headers = {'accept': 'application/json',}
 CMC_headers = {
-    'X-CMC_PRO_API_KEY': '98c35ce7-275c-46d3-9221-1c08ae3caf3f',
+    'X-CMC_PRO_API_KEY': '',
     'Accept': 'application/json',
 }
 # N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])

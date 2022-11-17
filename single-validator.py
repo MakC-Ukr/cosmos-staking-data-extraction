@@ -7,7 +7,7 @@ from threading import Thread
 from dotenv import load_dotenv
 from time import sleep
 import requests
-from helpers import bcolors, get_signatures, get_sign_ratio_from_signatures_array, get_rewards, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from helpers import bcolors, get_signatures, get_sign_ratio_from_signatures_array, get_rewards_current, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 
 # Loading prerequisites
 load_dotenv()
@@ -107,7 +107,7 @@ def MyThread9(res):
 # 18 - Rewards
 def MyThread10(res, validator_addr):
     t = time.time()
-    result_dict = get_rewards(validator_addr)
+    result_dict = get_rewards_current(validator_addr)
     for key in result_dict.keys():
         res[key] = result_dict[key]
     print(time.time()-t, "s for thread 10")

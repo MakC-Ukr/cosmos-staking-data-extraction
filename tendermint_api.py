@@ -36,3 +36,5 @@ def get_rewards(val_address, BLOCK):
                     # Probably "argument should be a bytes-like object or ASCII string, not 'NoneType'"
                     # Probably missing key or value
                     pass
+
+get_rewards('cosmosvaloper1fqzqejwkk898fcslw4z4eeqjzesynvrdfr5hte', 12788613)

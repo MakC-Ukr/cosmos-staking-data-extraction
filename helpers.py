@@ -74,7 +74,7 @@ def get_validator_stake(validator_addr):
 # 2 API requests are made inside this function
 def get_precommit_ratio(num_signatures):
     response = len(requests.get(RPC_URL+'/blocks/'+str(num_signatures), headers=headers).json()['block']['last_commit']['signatures'])
-    return ratio
+    return response
 
 # returns a dictionary containing: community tax to be paid, miniumum proposer bonus, and maximum proposer bonus
 def get_chain_distribution_parameters():
@@ -86,7 +86,7 @@ def get_chain_distribution_parameters():
     return result_dict
 
 # returns a dictionary of information: block number, denomination fo rewards, rewards accrued based on self-stake and based on delegation stakes
-def get_rewards(validator_addr):
+def get_rewards_current(validator_addr):
     # response = requests.get(RPC_URL+'/distribution/validators/'+validator_addr, headers=headers).json()
     # result_dict = {}
     # response = response['result']

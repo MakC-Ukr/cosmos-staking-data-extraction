@@ -6,7 +6,7 @@ from threading import Thread
 from time import sleep
 from dotenv import load_dotenv
 import requests
-from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_ALL_validators_info, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_fees_collected, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_ALL_validators_info, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 from postprocess_data import post_process_data
 
 # Loading prerequisites
@@ -73,7 +73,7 @@ def MyThread2(res, key):
 
 # 2, 20 - Total_Fees_Per_Block and txFees
 def MyThread3(res, key, _latest_block):
-    res[key] = get_fees_collected(_latest_block)
+    res[key] = get_total_fees(_latest_block)
 
 # 4 - block timestamp
 def MyThread4(res, key, _latest_block):

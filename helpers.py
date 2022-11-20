@@ -274,4 +274,4 @@ def get_recent_withdrawals(delegator_ad, val_ad, low_timestamp, high_timestamp):
 
     return total_withdrawn, last_withdrawal
 
-print(get_recent_withdrawals('cosmos1ttaum77gnpnlzd07ds8h5h3c9wlqekaqk8ugmk', 'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', 0, 1668935072))
+# print(get_recent_withdrawals('cosmos1ttaum77gnpnlzd07ds8h5h3c9wlqekaqk8ugmk', 'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', 0, 1668935072))

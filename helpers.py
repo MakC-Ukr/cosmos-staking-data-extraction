@@ -1,4 +1,6 @@
 import pandas as pd
+import calendar
+import datetime
 import base64
 import time
 import requests
@@ -15,6 +17,7 @@ from random import sample
 load_dotenv()
 MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
+RPC_URL_2 = os.getenv('RPC_URL_2')
 RPC_URL_3 = os.getenv('RPC_URL_3')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 headers = {'accept': 'application/json',}
@@ -224,3 +227,51 @@ def get_rewards(BLOCK):
                     pass
     
     return val_rewards
+
+
+def zulu_time_to_timestamp(zulu):
+    year = int(zulu.split("T")[0].split("-")[0])
+    month = int(zulu.split("T")[0].split("-")[1])
+    day = int(zulu.split("T")[0].split("-")[2])
+    hour = int(zulu.split("T")[1].split(":")[0])
+    min = int(zulu.split("T")[1].split(":")[1])
+    sec = int(zulu[:-1].split("T")[1].split(":")[2]) # remove the Z at the end
+    date_time = datetime.datetime(year, month, day, hour, min, sec)
+    unix = calendar.timegm(date_time.timetuple())
+    return unix
+
+def get_recent_withdrawals(delegator_ad, val_ad, low_timestamp, high_timestamp):
+    low_timestamp = float(low_timestamp)
+    high_timestamp = float(high_timestamp)
+
+    url = f"https://api-cosmos.cosmostation.io/v1/account/new_txs/{delegator_ad}?limit=50&from=0"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:107.0) Gecko/20100101 Firefox/107.0'
+    }
+    response = requests.get(url, headers = headers).json()
+
+    was_withdrawn = False
+    total_withdrawn = 0
+    last_withdrawal = -1
+
+    for tx in response:
+        time_str = zulu_time_to_timestamp(tx['header']['timestamp'])
+
+        if time_str < low_timestamp or time_str > high_timestamp:
+            print(time_str)
+            continue
+
+        logs = tx['data']['logs']
+        for log in logs:
+            events = log['events']
+            for event in events:
+                if event['type'] == 'withdraw_rewards' and event['attributes'][1]['value'] == val_ad:
+                    amt_withdrawn = event['attributes'][0]['value']
+                    amt_withdrawn = float(amt_withdrawn[:-5]) # assuming the amount is in the form of "1234uatom"
+                    was_withdrawn = True
+                    total_withdrawn += amt_withdrawn
+                    last_withdrawal = time_str
+
+    return total_withdrawn, last_withdrawal
+
+print(get_recent_withdrawals('cosmos1ttaum77gnpnlzd07ds8h5h3c9wlqekaqk8ugmk', 'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', 0, 1668935072))

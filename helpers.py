@@ -88,21 +88,14 @@ def get_chain_distribution_parameters():
     result_dict['max_proposer_bonus'] = response['bonus_proposer_reward']
     return result_dict
 
-# returns a dictionary of information: block number, denomination fo rewards, rewards accrued based on self-stake and based on delegation stakes
 def get_rewards_current(validator_addr):
-    # response = requests.get(RPC_URL+'/distribution/validators/'+validator_addr, headers=headers).json()
-    # result_dict = {}
-    # response = response['result']
-    # result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
-    # result_dict['commission_amt'] = response['val_commission']['commission'][0]['amount']
-    # return result_dict
+    """
+    Returns the commission earned by the validator till date
+    """
     response = requests.get(RPC_URL+f'/cosmos/distribution/v1beta1/validators/{validator_addr}/commission', headers=headers).json()
     result_dict = {}
     response = response['commission']['commission'][0]['amount']
-    # result_dict['self_bonded_rew_amt'] = response['self_bond_rewards'][0]['amount']
-    result_dict['commission_amt'] = response
-    print(result_dict)
-    return result_dict
+    return float(response)
 
 def list_to_dict(ls, keys):
     d = {}
@@ -144,6 +137,9 @@ def get_total_fees(_block_num):
     return total_fees
 
 def get_validator_commission(validator_addr):
+    """
+    Returns the commission percentage of the validator
+    """
     response = requests.get(RPC_URL+f'/cosmos/staking/v1beta1/validators/{validator_addr}', headers=headers).json()['validator']['commission']['commission_rates']['rate']
     response = float(response)*100
     return response
@@ -273,5 +269,3 @@ def get_recent_withdrawals(delegator_ad, val_ad, low_timestamp, high_timestamp):
                     last_withdrawal = time_str
 
     return total_withdrawn, last_withdrawal
-
-# print(get_recent_withdrawals('cosmos1ttaum77gnpnlzd07ds8h5h3c9wlqekaqk8ugmk', 'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', 0, 1668935072))

@@ -62,15 +62,12 @@ def process_all(file_name):
             print()
             print()
             ROWS_APPENDED+=1
-
             
     print("Rows appended: ", ROWS_APPENDED)
-
 
     new_df = pd.DataFrame(new_df_ls)
     dir_path = os.path.dirname(os.path.realpath(__file__))+f'/{ValidatorName}_processed.csv'
     new_df.to_csv(dir_path, index=False)
-
 
 # Sort
 dir_path = os.path.dirname(os.path.realpath(__file__))+'/'+file_name

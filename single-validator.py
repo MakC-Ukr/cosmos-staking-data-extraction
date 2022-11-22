@@ -8,20 +8,17 @@ from dotenv import load_dotenv
 from time import sleep
 from datetime import datetime
 import requests
-from helpers import bcolors, get_signatures, get_sign_ratio_from_signatures_array, get_rewards_current, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from helpers import bcolors, get_signatures, post_process_data, get_sign_ratio_from_signatures_array, get_rewards_current, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 
 # Loading prerequisites
 load_dotenv()
 N_BLOCKS_TO_GET = 50
-VALIDATOR_NAME = ["Coinbase"]
-VALIDATOR_ADDRESS = ["cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en"]
+VALIDATOR_NAME = ["Coinbase", "Twinstake", "Figment"]
+VALIDATOR_ADDRESS = ["cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en", "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69", "cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d"]
 VALIDATOR_STAKES = []
 assert len(VALIDATOR_ADDRESS) == len(VALIDATOR_NAME), "VALIDATOR_ADDRESS and VALIDATOR_NAME must have the same length"
 for i in range(len(VALIDATOR_ADDRESS)):
     VALIDATOR_STAKES.append(get_validator_stake(VALIDATOR_ADDRESS[i]))
-
-dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{datetime.utcnow()}.csv'
-df_ls = []
 
 RPC_URL = os.getenv('RPC_URL')
 RPC_URL_2 = os.getenv('RPC_URL_2')
@@ -162,7 +159,7 @@ def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_ad
     for thread in all_threads:
         thread.join()
 
-    dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{VALIDATOR_NAME}.csv'
+    dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/multiple.csv'
     print(bcolors.OKGREEN, "result for block ", LATEST_BLOCK," : ", bcolors.ENDC, result)
     try:
         df = pd.read_csv(dir_path)
@@ -174,6 +171,7 @@ def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_ad
 
     print(bcolors.OKCYAN, "Time taken for block : ", LATEST_BLOCK, ": ", time.time() - t, bcolors.ENDC)
     print()
+
 
 past_block_num = 0
 new_block = 0
@@ -203,7 +201,26 @@ while(got_blocks < N_BLOCKS_TO_GET):
 
 print("End of Data Collection")
 
+
 for i in threads_to_stop:
     i.join()
 
-print("Done")
+# 
+# Getting block fees for previous blocks and post processing
+#
+
+print("Getting block fees for previous blocks")
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/single_validators/multiple.csv'
+df= pd.read_csv(dir_path)
+
+for i in tqdm(range(len(df))):
+    block_num = df.iloc[i]['block_num']
+    row = df.iloc[i] 
+    row['total_block_fees'] = get_total_fees(block_num)
+    df.iloc[i] = row
+    df.to_csv(dir_path, index=False)
+    time.sleep(3)
+
+dir_path = os.path.dirname(os.path.realpath(__file__))+'/single_validators/multiple-processed.csv'
+processed_df = post_process_data(df)
+processed_df.to_csv(dir_path, index=False)

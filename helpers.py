@@ -285,7 +285,8 @@ def time_to_unix(time):
     return unix_timestamp 
 
 # @param df - DataFrame containing Data Extraction code
-def post_process_data(df):
+def post_process_data(df, N_validators):
+    DEFAULT_BLOCK_TIME = 6.5
     # Read the dataframe and sort by values
     ROWS_APPENDED= 0
     df.sort_values(by=['block_num'], inplace=True)

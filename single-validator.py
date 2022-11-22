@@ -1,4 +1,5 @@
 import time
+from tqdm import tqdm
 import threading
 import json
 import os
@@ -10,11 +11,14 @@ from datetime import datetime
 import requests
 from helpers import bcolors, get_signatures, post_process_data, get_sign_ratio_from_signatures_array, get_rewards_current, get_block_time, get_total_supply, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
 
-# Loading prerequisites
+# parameters to set
 load_dotenv()
-N_BLOCKS_TO_GET = 50
+N_BLOCKS_TO_GET = 300
 VALIDATOR_NAME = ["Coinbase", "Twinstake", "Figment"]
 VALIDATOR_ADDRESS = ["cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en", "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69", "cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d"]
+datafile_name = "multiple"
+
+# Loading prerequisites
 VALIDATOR_STAKES = []
 assert len(VALIDATOR_ADDRESS) == len(VALIDATOR_NAME), "VALIDATOR_ADDRESS and VALIDATOR_NAME must have the same length"
 for i in range(len(VALIDATOR_ADDRESS)):
@@ -126,12 +130,6 @@ def MyThread10(res, validator_addr, validator_index):
 #     if 'commission' not in CONST_ATTRIBUTES.keys():
 #     print(time.time()-t, "s for thread 11")
 
-# thread to save the signatures of the block in a separate folder
-def MyThread12(_block_num):
-    t = time.time()
-    resp = get_signatures(_block_num)
-    json.dump(resp, open(f'./val_participation/block_signatures/{_block_num}.json', 'w'))
-    print(time.time()-t, "s for thread 12")
 
 def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_addr):
     t = time.time()
@@ -147,8 +145,7 @@ def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_ad
         threading.Thread(target=MyThread5, args=[result, "sign_ratio", _block_signatures]),
         threading.Thread(target=MyThread6, args=[result, "atom_staked_v"]),
         threading.Thread(target=MyThread7, args=[result, "total_supply"]),
-        threading.Thread(target=MyThread9, args=[result]),
-        threading.Thread(target=MyThread12, args=[LATEST_BLOCK])
+        threading.Thread(target=MyThread9, args=[result])
     ]
 
     for val_ind, validator in enumerate(VALIDATOR_ADDRESS):
@@ -159,7 +156,7 @@ def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_ad
     for thread in all_threads:
         thread.join()
 
-    dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/multiple.csv'
+    dir_path = dir_path = os.path.dirname(os.path.realpath(__file__))+ f'/single_validators/{datafile_name}.csv'
     print(bcolors.OKGREEN, "result for block ", LATEST_BLOCK," : ", bcolors.ENDC, result)
     try:
         df = pd.read_csv(dir_path)
@@ -206,11 +203,11 @@ for i in threads_to_stop:
     i.join()
 
 # 
-# Getting block fees for previous blocks and post processing
+# Getting block fees for extracted blocks 
 #
 
 print("Getting block fees for previous blocks")
-dir_path = os.path.dirname(os.path.realpath(__file__))+'/single_validators/multiple.csv'
+dir_path = os.path.dirname(os.path.realpath(__file__))+f'/single_validators/{datafile_name}.csv'
 df= pd.read_csv(dir_path)
 
 for i in tqdm(range(len(df))):
@@ -221,6 +218,10 @@ for i in tqdm(range(len(df))):
     df.to_csv(dir_path, index=False)
     time.sleep(3)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))+'/single_validators/multiple-processed.csv'
-processed_df = post_process_data(df)
+# 
+# Post processing
+#
+
+dir_path = os.path.dirname(os.path.realpath(__file__))+f'/single_validators/{datafile_name}-processed.csv'
+processed_df = post_process_data(df, len(VALIDATOR_ADDRESS))
 processed_df.to_csv(dir_path, index=False)

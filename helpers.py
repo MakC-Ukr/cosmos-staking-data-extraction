@@ -17,7 +17,6 @@ from random import sample
 load_dotenv()
 MAX_TXNS_PER_BLOCK = 50
 RPC_URL = os.getenv('RPC_URL')
-RPC_URL_2 = os.getenv('RPC_URL_2')
 RPC_URL_3 = os.getenv('RPC_URL_3')
 COSMOSCAN_API = os.getenv('COSMOSCAN_API')
 headers = {'accept': 'application/json',}
@@ -25,20 +24,6 @@ CMC_headers = {
     'X-CMC_PRO_API_KEY': '',
     'Accept': 'application/json',
 }
-# N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])
-# print("n_active_validators: ", N_ACTIVE_VALIDATORS)
-##
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
 
 def get_inflation():    
     response = requests.get(RPC_URL+'/cosmos/mint/v1beta1/inflation', headers=headers).json()
@@ -110,20 +95,6 @@ def get_total_supply():
 def get_block_time(bl_num):
     response = requests.get(RPC_URL+'/blocks/'+str(bl_num), headers=headers).json()['block']['header']['time']
     return response
-
-# def get_fees_collected(block_number):    
-#     params = {
-#         'limit': '30',
-#     }
-#     response = requests.get('https://api.cosmostation.io/v1/txs', params=params, headers=headers).json()
-#     total_fees = 0
-
-#     for tx in response:
-#         act_block_height = tx['data']['height']
-#         act_fee = float(tx['data']['tx']['auth_info']['fee']['amount'][0]['amount'])
-#         if act_block_height == str(block_number):
-#             total_fees+=act_fee
-#     return total_fees
 
 def get_total_fees(_block_num):
     params = {
@@ -203,7 +174,6 @@ def get_rewards(BLOCK):
     for event in begin_block_events:
         if event['type'] == "rewards": # "proposer_reward" type event intentionally not mentioned because it is duplicated as "reward" as well
             if len(event['attributes']) != 2:
-                print(bcolors.WARNING, "skipping block with diff shape. Type: ", event['type'], bcolors.ENDC)
                 # Probably skipping event with wrong shape
                 pass
             else:
@@ -217,7 +187,6 @@ def get_rewards(BLOCK):
                     if key0 == "amount" and key1 == "validator" and event['type'] == 'rewards':
                         val_rewards[value1] += float(value0[:-5])
                 except TypeError:
-                    # print(bcolors.WARNING, "Error 1: check file code", bcolors.ENDC)
                     # Probably "argument should be a bytes-like object or ASCII string, not 'NoneType'"
                     # Probably missing key or value
                     pass

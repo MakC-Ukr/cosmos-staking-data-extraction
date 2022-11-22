@@ -13,7 +13,7 @@ from helpers import bcolors, get_signatures, post_process_data, get_sign_ratio_f
 
 # parameters to set
 load_dotenv()
-N_BLOCKS_TO_GET = 300
+N_BLOCKS_TO_GET = 150
 VALIDATOR_NAME = ["Coinbase", "Twinstake", "Figment"]
 VALIDATOR_ADDRESS = ["cosmosvaloper1c4k24jzduc365kywrsvf5ujz4ya6mwympnc4en", "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69", "cosmosvaloper1hjct6q7npsspsg3dgvzk3sdf89spmlpfdn6m9d"]
 datafile_name = "multiple"
@@ -25,8 +25,7 @@ for i in range(len(VALIDATOR_ADDRESS)):
     VALIDATOR_STAKES.append(get_validator_stake(VALIDATOR_ADDRESS[i]))
 
 RPC_URL = os.getenv('RPC_URL')
-RPC_URL_2 = os.getenv('RPC_URL_2')
-RPC_URL_3 = os.getenv('RPC_URL_3')
+RPC_URL_PRIVATE = os.getenv('RPC_URL_PRIVATE')
 N_ACTIVE_VALIDATORS = int(requests.get(RPC_URL+'/validatorsets/latest', headers=headers).json()['result']['total'])
 CHAIN_DISTRIBUTION_PARAMS = get_chain_distribution_parameters()
 
@@ -123,13 +122,6 @@ def MyThread10(res, validator_addr, validator_index):
     t = time.time()
     res[f'val_{validator_index}_com_amt'] = get_rewards_current(validator_addr)
     print(time.time()-t, "s for thread 10")
-
-# 22 - validator commission
-# def MyThread11(res, key, validator_addr):
-#     t = time.time()
-#     if 'commission' not in CONST_ATTRIBUTES.keys():
-#     print(time.time()-t, "s for thread 11")
-
 
 def get_all_block_data(LATEST_BLOCK, _block_signatures, _timestamp, _proposer_addr):
     t = time.time()

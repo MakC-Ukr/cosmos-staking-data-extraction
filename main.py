@@ -6,16 +6,34 @@ from threading import Thread
 from time import sleep
 from dotenv import load_dotenv
 import requests
-from helpers import bcolors, get_rewards, get_block_time, get_total_supply, get_ALL_validators_info, get_chain_distribution_parameters, get_supply_bonded_ratio, get_n_validators, get_n_active_validators, get_total_fees, get_timestamp, get_validator_stake, get_precommit_ratio, headers, get_inflation, list_to_dict, get_validator_commission
+from helpers import (
+    bcolors,
+    get_rewards,
+    get_block_time,
+    get_total_supply,
+    get_ALL_validators_info,
+    get_chain_distribution_parameters,
+    get_supply_bonded_ratio,
+    get_n_validators,
+    get_n_active_validators,
+    get_total_fees,
+    get_timestamp,
+    get_validator_stake,
+    get_precommit_ratio,
+    headers,
+    get_inflation,
+    list_to_dict,
+    get_validator_commission,
+)
 from postprocess_data import post_process_data
 
 # Loading prerequisites
 load_dotenv()
-df = pd.read_csv('data.csv')
-df_ls = df.to_dict('records')
+df = pd.read_csv("data.csv")
+df_ls = df.to_dict("records")
 COLUMN_NAMES = list(df.columns)
-RPC_URL = os.getenv('RPC_URL')
-BLOCKS_TO_RUN_FOR = 300 # 10 mins = ~100 blocks
+RPC_URL = os.getenv("RPC_URL")
+BLOCKS_TO_RUN_FOR = 300  # 10 mins = ~100 blocks
 
 
 TOP20_VALIDATORS = [
@@ -39,41 +57,44 @@ TOP20_VALIDATORS = [
     # 'cosmosvaloper1lzhlnpahvznwfv4jmay2tgaha5kmz5qxerarrl', # Citadel.one
     # 'cosmosvaloper1zqgheeawp7cmqk27dgyctd80rd8ryhqs6la9wc', # NO! Fee to 2025 💸 | melea.xyz
     # 'cosmosvaloper1g48268mu5vfp4wk7dk89r0wdrakm9p5xk0q50k', # Provalidator
-    'cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69', # Twinstake Validator
+    "cosmosvaloper1svwt2mr4x2mx0hcmty0mxsa4rmlfau4lwx2l69",  # Twinstake Validator
     # 'cosmosvaloper1uxlf7mvr8nep3gm7udf2u9remms2jyjqvwdul2', # Kiln.fi
 ]
 
 # CONST VALUES - 9,10,11,12,13,17,21
 BLOCKS_PRE_YEAR = 4360000
 CONST_ATTRIBUTES = {
-        "Block_length_target": (365*24*60*60)/BLOCKS_PRE_YEAR,
-        "Goal_Bonded": 0.6666,
-        "Inflation_Rate_Change": 0.13,
-        "Min_Inflation_Rate": 0.07,
-        "Max_Inflation_Rate": 0.20,
-        "Min_Signatures": 0.6666,
-        "Blocks_per_year": BLOCKS_PRE_YEAR
-    }
+    "Block_length_target": (365 * 24 * 60 * 60) / BLOCKS_PRE_YEAR,
+    "Goal_Bonded": 0.6666,
+    "Inflation_Rate_Change": 0.13,
+    "Min_Inflation_Rate": 0.07,
+    "Max_Inflation_Rate": 0.20,
+    "Min_Signatures": 0.6666,
+    "Blocks_per_year": BLOCKS_PRE_YEAR,
+}
 
 
 # No API calls to get data
 def MyThread0(res, _latest_block):
-    res['block_num'] = _latest_block
+    res["block_num"] = _latest_block
     for key in CONST_ATTRIBUTES.keys():
         res[key] = CONST_ATTRIBUTES[key]
 
 
 # 1 - INFLATION RATE
 def MyThread1(res, key):
-    res[key] = get_inflation() 
+    res[key] = get_inflation()
+
 
 # 0 - PERCENTAGE ATOM STAKED
 def MyThread2(res, key):
-    res[key] = get_supply_bonded_ratio()  
+    res[key] = get_supply_bonded_ratio()
+
 
 # 2, 20 - Total_Fees_Per_Block and txFees
 def MyThread3(res, key, _latest_block):
     res[key] = get_total_fees(_latest_block)
+
 
 # 4 - block timestamp
 def MyThread4(res, key, _latest_block):
@@ -84,13 +105,16 @@ def MyThread4(res, key, _latest_block):
 def MyThread5(res, key, _latest_block):
     res[key] = get_precommit_ratio(_latest_block)
 
+
 # 7 - TOTAL SUPPLY - THIS IS WRONG
 def MyThread7(res, key):
     res[key] = get_total_supply()
 
+
 # 8 - N ACTIVE VALIDATORS
 def MyThread8(res, key):
-    res[key] = get_n_active_validators() 
+    res[key] = get_n_active_validators()
+
 
 # 14, 15, 16 - min proposer bonus, max proposer bonus, community tax
 def MyThread9(res):
@@ -98,11 +122,13 @@ def MyThread9(res):
     for key in result_dict.keys():
         res[key] = result_dict[key]
 
+
 # v1_stake - get info (stake+commission) for top20 validators
 def MyThread6(res, validator_list):
     dict_res = get_ALL_validators_info(validator_list)
     for key in dict_res.keys():
         res[key] = dict_res[key]
+
 
 #
 # 20 threads for validator rewards
@@ -116,7 +142,7 @@ def MyThread6(res, validator_list):
 def MyThread_R1(res, validator_addr, validator_index):
     result_dict = get_rewards(validator_addr)
     for key in result_dict.keys():
-        res["v"+ str(validator_index) + key] = result_dict[key]
+        res["v" + str(validator_index) + key] = result_dict[key]
 
 
 # Uncomment the following thread and run it if you have a small validator set (this will run the API calls sequentially)
@@ -128,6 +154,7 @@ def MyThread_R1(res, validator_addr, validator_index):
 #             res["v"+ str(validator_index) + key] = result_dict[key]
 #             validator_index+=1
 
+
 def get_all_block_data(LATEST_BLOCK):
     result = {}
 
@@ -135,7 +162,9 @@ def get_all_block_data(LATEST_BLOCK):
         threading.Thread(target=MyThread0, args=[result, LATEST_BLOCK]),
         threading.Thread(target=MyThread1, args=[result, "inflation_rate"]),
         threading.Thread(target=MyThread2, args=[result, "percent_staked"]),
-        threading.Thread(target=MyThread3, args=[result, "total_block_fees", LATEST_BLOCK]),
+        threading.Thread(
+            target=MyThread3, args=[result, "total_block_fees", LATEST_BLOCK]
+        ),
         threading.Thread(target=MyThread4, args=[result, "timestamp", LATEST_BLOCK]),
         threading.Thread(target=MyThread5, args=[result, "sign_ratio", LATEST_BLOCK]),
         threading.Thread(target=MyThread7, args=[result, "total_supply"]),
@@ -146,8 +175,11 @@ def get_all_block_data(LATEST_BLOCK):
     ]
 
     all_threads.extend(
-        [threading.Thread(target=MyThread_R1, args=[result, validator_addr, i]) for i, validator_addr in enumerate(TOP20_VALIDATORS)]
-    )  
+        [
+            threading.Thread(target=MyThread_R1, args=[result, validator_addr, i])
+            for i, validator_addr in enumerate(TOP20_VALIDATORS)
+        ]
+    )
 
     t = time.time()
     for thread in all_threads:
@@ -157,11 +189,19 @@ def get_all_block_data(LATEST_BLOCK):
         thread.join()
 
     df_ls.append(result)
-    dir_path = os.path.abspath('')+'/data.csv'
+    dir_path = os.path.abspath("") + "/data.csv"
     pd.DataFrame(df_ls).to_csv(dir_path, index=False)
 
-    print(bcolors.OKCYAN, "Time taken for block : ", LATEST_BLOCK, ": ", time.time() - t, bcolors.ENDC)
+    print(
+        bcolors.OKCYAN,
+        "Time taken for block : ",
+        LATEST_BLOCK,
+        ": ",
+        time.time() - t,
+        bcolors.ENDC,
+    )
     print()
+
 
 past_block_num = 0
 new_block = 0
@@ -181,13 +221,18 @@ count_blocks = 0
 #         except:
 #             time.sleep(2)
 
-while(count_blocks < BLOCKS_TO_RUN_FOR):
+while count_blocks < BLOCKS_TO_RUN_FOR:
     while past_block_num == new_block:
-        new_block = int(requests.get(RPC_URL+'/cosmos/base/tendermint/v1beta1/blocks/latest', headers=headers).json()['block']['header']['height']) # gets latest block number
+        new_block = int(
+            requests.get(
+                RPC_URL + "/cosmos/base/tendermint/v1beta1/blocks/latest",
+                headers=headers,
+            ).json()["block"]["header"]["height"]
+        )  # gets latest block number
     print(bcolors.OKCYAN, "BLOCK ", new_block, bcolors.ENDC)
     get_all_block_data(new_block)
     past_block_num = new_block
-    count_blocks+=1
+    count_blocks += 1
 
 # rewards_after_list = {}
 # for ind, i in enumerate(TOP20_VALIDATORS):
